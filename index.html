@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COMBAT FIRE - Sistema de Conformidade</title>
+  <style>
+    body { margin:0; padding:0; font-family:Arial, sans-serif; background:#f4f4f4; }
+    header { background:#b30000; color:white; padding:20px; text-align:center; font-size:28px; font-weight:bold; }
+
+    .tabs { display:flex; background:#8b0000; }
+    .tab-btn { flex:1; padding:14px; color:white; background:transparent; border:none; cursor:pointer; font-size:16px; font-weight:bold; border-bottom:4px solid transparent; transition:0.2s; }
+    .tab-btn.ativo { background:#b30000; border-bottom:4px solid #ffcc00; }
+    .tab-btn:hover { background:#9a0000; }
+
+    .pagina { display:none; }
+    .pagina.ativa { display:block; }
+
+    .container { max-width:1300px; margin:auto; padding:20px; }
+    .card { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    h2 { color:#b30000; margin-top:0; }
+
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; }
+    label { font-weight:bold; display:block; margin-bottom:5px; color:#444; }
+    input, select, textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; }
+    textarea { min-height:140px; resize:vertical; }
+
+    button { background:#b30000; color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; margin-top:15px; font-weight:bold; }
+    button:hover { opacity:0.9; }
+    .btn-verde { background:#1a7a1a; }
+    .btn-azul { background:#0055aa; }
+    .btn-cinza { background:#666; }
+
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+    th { background:#b30000; color:white; }
+
+    .empresa-card { border-left:6px solid #b30000; }
+    .vencido { background:#ffcccc; font-weight:bold; }
+    .breve { background:#fff0b3; font-weight:bold; }
+    .valido { background:#ccffcc; font-weight:bold; }
+    .empresa-titulo { font-size:24px; color:#b30000; font-weight:bold; margin-bottom:15px; }
+    .secao { margin-top:30px; }
+
+    /* PESQUISA */
+    .search-bar { display:flex; gap:10px; margin-bottom:20px; }
+    .search-bar input { flex:1; font-size:16px; }
+    .search-bar button { margin-top:0; }
+
+    .resultado-item { background:white; border-left:6px solid #b30000; border-radius:8px; padding:15px 20px; margin-bottom:12px; box-shadow:0 0 8px rgba(0,0,0,0.08); cursor:pointer; transition:0.2s; }
+    .resultado-item:hover { box-shadow:0 0 14px rgba(179,0,0,0.25); }
+    .resultado-item h3 { margin:0 0 5px; color:#b30000; }
+    .resultado-item p { margin:2px 0; font-size:14px; color:#555; }
+
+    .detalhe-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:1000; overflow-y:auto; }
+    .detalhe-overlay.aberto { display:block; }
+    .detalhe-box { background:white; max-width:1200px; margin:30px auto; border-radius:12px; padding:30px; position:relative; }
+    .fechar-detalhe { position:absolute; top:15px; right:20px; background:#666; padding:8px 16px; font-size:14px; }
+
+    .badge-status { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; }
+
+    .aviso-vazio { text-align:center; color:#999; padding:40px; font-size:16px; }
+
+    /* Toast */
+    #toast { position:fixed; bottom:30px; right:30px; background:#1a7a1a; color:white; padding:14px 24px; border-radius:10px; font-weight:bold; font-size:15px; display:none; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+    #toast.erro { background:#b30000; }
+  </style>
+</head>
+<body>
+
+<header>COMBAT FIRE - SISTEMA DE CONFORMIDADE</header>
+
+<div class="tabs">
+  <button class="tab-btn ativo" onclick="mudarAba('cadastro')">➕ CADASTRAR EMPRESA</button>
+  <button class="tab-btn" onclick="mudarAba('pesquisa')">🔍 PESQUISAR EMPRESAS</button>
+</div>
+
+<!-- ===== ABA CADASTRO ===== -->
+<div id="aba-cadastro" class="pagina ativa">
+  <div class="container">
+    <div class="card">
+      <h2>Cadastrar Empresa</h2>
+      <div class="grid">
+        <div><label>Empresa</label><input type="text" id="empresa"></div>
+        <div><label>Responsável</label><input type="text" id="responsavel"></div>
+        <div><label>Telefone</label><input type="text" id="telefone"></div>
+        <div><label>WhatsApp</label><input type="text" id="whatsapp"></div>
+        <div><label>Email</label><input type="email" id="email"></div>
+        <div><label>CNPJ</label><input type="text" id="cnpj" placeholder="00.000.000/0000-00"></div>
+        <div>
+          <label>CNPJ Principal (Matriz) <span style="font-weight:normal;color:#888;">— opcional, para filiais</span></label>
+          <select id="cnpjPrincipal">
+            <option value="">Nenhum (empresa independente)</option>
+          </select>
+        </div>
+        <div><label>Observações</label><input type="text" id="obs"></div>
+      </div>
+      <button onclick="cadastrarEmpresa()">CADASTRAR EMPRESA</button>
+    </div>
+    <div id="listaEmpresas"></div>
+  </div>
+</div>
+
+<!-- ===== ABA PESQUISA ===== -->
+<div id="aba-pesquisa" class="pagina">
+  <div class="container">
+    <div class="card">
+      <h2>Pesquisar Empresas Cadastradas</h2>
+      <div class="search-bar">
+        <input type="text" id="campoPesquisa" placeholder="Buscar por nome, CNPJ, responsável ou email..." oninput="pesquisarEmpresas()">
+        <button onclick="pesquisarEmpresas()">BUSCAR</button>
+        <button class="btn-cinza" onclick="limparPesquisa()">LIMPAR</button>
+      </div>
+      <div id="resultadosPesquisa"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OVERLAY DETALHE ===== -->
+<div id="detalheOverlay" class="detalhe-overlay">
+  <div class="detalhe-box">
+    <button class="fechar-detalhe btn-cinza" onclick="fecharDetalhe()">✕ FECHAR</button>
+    <div id="detalheConteudo"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============ UTILIDADES ============
+
+let empresas = []; // em edição no formulário
+let empresaSendoEditada = null; // ID da empresa aberta no overlay de edição
+
+function mostrarToast(msg, erro = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = erro ? 'erro' : '';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function mudarAba(aba) {
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+  document.getElementById('aba-' + aba).classList.add('ativa');
+  event.target.classList.add('ativo');
+  if (aba === 'pesquisa') pesquisarEmpresas();
+}
+
+// ============ LOCALSTORAGE ============
+
+function salvarNoBanco(empresa) {
+  const banco = carregarBanco();
+  const idx = banco.findIndex(e => e.id === empresa.id);
+  if (idx >= 0) banco[idx] = empresa;
+  else banco.push(empresa);
+  localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+}
+
+function carregarBanco() {
+  try {
+    return JSON.parse(localStorage.getItem('combatfire_empresas') || '[]');
+  } catch { return []; }
+}
+
+function excluirDoBanco(id) {
+  const banco = carregarBanco().filter(e => e.id !== id);
+  localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+}
+
+// ============ STATUS ============
+
+function calcularStatus(dataValidade) {
+  if (!dataValidade) return { texto: 'SEM DATA', classe: 'breve' };
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const validade = new Date(dataValidade); validade.setHours(0,0,0,0);
+  const diferenca = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
+  if (diferenca < 0) return { texto: 'VENCIDO', classe: 'vencido' };
+  if (diferenca <= 30) return { texto: 'VENCE EM BREVE', classe: 'breve' };
+  return { texto: 'VÁLIDO', classe: 'valido' };
+}
+
+// ============ CADASTRO ============
+
+function normalizarCNPJ(cnpj) {
+  return (cnpj || '').replace(/\D/g, '');
+}
+
+function popularSelectMatriz() {
+  const banco = carregarBanco();
+  const sel = document.getElementById('cnpjPrincipal');
+  if (!sel) return;
+  // Mantém apenas a opção padrão e rebuilda
+  sel.innerHTML = '<option value="">Nenhum (empresa independente)</option>';
+  // Só matrizes (sem cnpjPrincipal) podem ser selecionadas como principal
+  const matrizes = banco.filter(e => !e.cnpjPrincipal);
+  matrizes.forEach(e => {
+    if (e.cnpj) {
+      const opt = document.createElement('option');
+      opt.value = e.cnpj;
+      opt.textContent = `${e.nome} — ${e.cnpj}`;
+      sel.appendChild(opt);
+    }
+  });
+}
+
+function cadastrarEmpresa() {
+  const nomeEmpresa = document.getElementById('empresa').value.trim();
+  if (!nomeEmpresa) { mostrarToast('Preencha o nome da empresa.', true); return; }
+
+  const cnpjDigitado = document.getElementById('cnpj').value.trim();
+  const cnpjNorm = normalizarCNPJ(cnpjDigitado);
+
+  // Verificar CNPJ duplicado
+  if (cnpjNorm) {
+    const banco = carregarBanco();
+    const duplicado = banco.find(e => normalizarCNPJ(e.cnpj) === cnpjNorm);
+    if (duplicado) {
+      mostrarToast(`⚠️ CNPJ já cadastrado: "${duplicado.nome}"`, true);
+      return;
+    }
+  }
+
+  const cnpjPrincipal = document.getElementById('cnpjPrincipal').value;
+
+  const empresa = {
+    id: 'EMP-' + Date.now(),
+    nome: nomeEmpresa,
+    responsavel: document.getElementById('responsavel').value,
+    telefone: document.getElementById('telefone').value,
+    whatsapp: document.getElementById('whatsapp').value,
+    email: document.getElementById('email').value,
+    cnpj: cnpjDigitado,
+    cnpjPrincipal: cnpjPrincipal || '',
+    obs: document.getElementById('obs').value,
+    documentos: [],
+    extintores: []
+  };
+
+  // Limpa campos
+  ['empresa','responsavel','telefone','whatsapp','email','cnpj','obs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cnpjPrincipal').value = '';
+
+  empresas.push(empresa);
+  renderizarEmpresas();
+  popularSelectMatriz();
+}
+
+function toggleBrigada(idEmpresa) {
+  const tipo = document.getElementById(`tipoDoc-${idEmpresa}`).value;
+  document.getElementById(`brigadaBox-${idEmpresa}`).style.display =
+    tipo === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
+}
+
+function adicionarDocumento(idEmpresa) {
+  const tipo = document.getElementById(`tipoDoc-${idEmpresa}`).value;
+  const numeroDocumento = document.getElementById(`numeroDocumento-${idEmpresa}`).value;
+  const participantes = document.getElementById(`participantes-${idEmpresa}`).value;
+  const emissao = document.getElementById(`emissaoDoc-${idEmpresa}`).value;
+  const tipoValidade = document.getElementById(`tipoValidadeDoc-${idEmpresa}`).value;
+  const quantidade = parseInt(document.getElementById(`quantidadeValidadeDoc-${idEmpresa}`).value);
+
+  if (!numeroDocumento || !emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+
+  let dataValidade = new Date(emissao);
+  if (tipoValidade === 'anos') dataValidade.setFullYear(dataValidade.getFullYear() + quantidade);
+  else dataValidade.setMonth(dataValidade.getMonth() + quantidade);
+  const validade = dataValidade.toISOString().split('T')[0];
+
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  empresa.documentos.push({ tipo, numeroDocumento, participantes, emissao, validade, tipoValidade, quantidade });
+  renderizarEmpresas();
+}
+
+function adicionarExtintor(idEmpresa) {
+  const numero = document.getElementById(`numeroExt-${idEmpresa}`).value;
+  const agente = document.getElementById(`agenteExt-${idEmpresa}`).value;
+  const capacidade = document.getElementById(`capacidadeExt-${idEmpresa}`).value;
+  const validadeRecarga = document.getElementById(`validadeRecarga-${idEmpresa}`).value;
+  const validadeHidro = document.getElementById(`validadeHidro-${idEmpresa}`).value;
+
+  if (!numero) { mostrarToast('Informe o número do extintor.', true); return; }
+
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  empresa.extintores.push({ numero, agente, capacidade, validadeRecarga, validadeHidro });
+  renderizarEmpresas();
+}
+
+function editarDocumento(idEmpresa, index) {
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  const doc = empresa.documentos[index];
+  const novoNumero = prompt('Editar número do documento:', doc.numeroDocumento);
+  if (novoNumero !== null) doc.numeroDocumento = novoNumero;
+  const novosParticipantes = prompt('Editar participantes da brigada:', doc.participantes || '');
+  if (novosParticipantes !== null) doc.participantes = novosParticipantes;
+  renderizarEmpresas();
+}
+
+function excluirDocumento(idEmpresa, index) {
+  if (!confirm('Deseja realmente excluir este documento?')) return;
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  empresa.documentos.splice(index, 1);
+  renderizarEmpresas();
+}
+
+function editarExtintor(idEmpresa, index) {
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  const ext = empresa.extintores[index];
+  const novoNumero = prompt('Editar número do extintor:', ext.numero);
+  if (novoNumero !== null) ext.numero = novoNumero;
+  const novaCapacidade = prompt('Editar capacidade:', ext.capacidade);
+  if (novaCapacidade !== null) ext.capacidade = novaCapacidade;
+  renderizarEmpresas();
+}
+
+function excluirExtintor(idEmpresa, index) {
+  if (!confirm('Deseja realmente excluir este extintor?')) return;
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  empresa.extintores.splice(index, 1);
+  renderizarEmpresas();
+}
+
+function concluirEmpresa(idEmpresa) {
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  salvarNoBanco(empresa);
+  mostrarToast(`✅ "${empresa.nome}" salva com sucesso!`);
+  // Remove do formulário de cadastro
+  empresas = empresas.filter(e => e.id !== idEmpresa);
+  renderizarEmpresas();
+}
+
+function renderizarEmpresas() {
+  const lista = document.getElementById('listaEmpresas');
+  lista.innerHTML = '';
+
+  if (empresas.length === 0) return;
+
+  empresas.forEach(empresa => {
+    let html = `
+      <div class="card empresa-card">
+        <div class="empresa-titulo">${empresa.nome} | ID: ${empresa.id}</div>
+        <p><b>Responsável:</b> ${empresa.responsavel}</p>
+        <p><b>WhatsApp:</b> ${empresa.whatsapp}</p>
+        <p><b>Email:</b> ${empresa.email}</p>
+        <p><b>CNPJ:</b> ${empresa.cnpj}</p>
+        <p><b>Observações:</b> ${empresa.obs}</p>
+
+        <div class="secao">
+          <h2>Documentos da Empresa e Atestado de Brigada</h2>
+          <div class="grid">
+            <div><label>Número do Documento</label><input type="text" id="numeroDocumento-${empresa.id}"></div>
+            <div>
+              <label>Tipo de Documento</label>
+              <select id="tipoDoc-${empresa.id}" onchange="toggleBrigada('${empresa.id}')">
+                <option>Certificado de Conformidade</option>
+                <option>Atestado de Brigada de Incêndio</option>
+                <option>AVCB</option>
+                <option>Laudo Técnico</option>
+                <option>Treinamento de Brigada</option>
+                <option>Plano de Emergência</option>
+              </select>
+            </div>
+            <div><label>Data de Emissão</label><input type="date" id="emissaoDoc-${empresa.id}"></div>
+            <div>
+              <label>Tipo de Validade</label>
+              <select id="tipoValidadeDoc-${empresa.id}">
+                <option value="meses">Meses</option>
+                <option value="anos">Anos</option>
+              </select>
+            </div>
+            <div><label>Quantidade</label><input type="number" id="quantidadeValidadeDoc-${empresa.id}"></div>
+          </div>
+          <div id="brigadaBox-${empresa.id}" style="display:none;margin-top:20px;">
+            <label>Participantes da Brigada</label>
+            <textarea id="participantes-${empresa.id}" placeholder="Digite um participante por linha"></textarea>
+          </div>
+          <button onclick="adicionarDocumento('${empresa.id}')">ADICIONAR DOCUMENTO / ATESTADO</button>
+          <table>
+            <thead><tr>
+              <th>Tipo</th><th>Nº Doc</th><th>Participantes</th>
+              <th>Emissão</th><th>Periodicidade</th><th>Validade</th><th>Status</th><th>Ações</th>
+            </tr></thead>
+            <tbody>
+    `;
+
+    empresa.documentos.forEach((doc, index) => {
+      const status = calcularStatus(doc.validade);
+      html += `<tr>
+        <td>${doc.tipo}</td><td>${doc.numeroDocumento}</td>
+        <td style="white-space:pre-line;text-align:left;">${doc.participantes || '-'}</td>
+        <td>${doc.emissao}</td><td>${doc.quantidade} ${doc.tipoValidade}</td>
+        <td>${doc.validade}</td>
+        <td class="${status.classe}">${status.texto}</td>
+        <td>
+          <button onclick="editarDocumento('${empresa.id}',${index})">Editar</button>
+          <button onclick="excluirDocumento('${empresa.id}',${index})">Excluir</button>
+        </td>
+      </tr>`;
+    });
+
+    html += `</tbody></table></div>
+
+        <div class="secao">
+          <h2>Extintores</h2>
+          <div class="grid">
+            <div><label>Número do Extintor</label><input type="text" id="numeroExt-${empresa.id}"></div>
+            <div>
+              <label>Agente do Extintor</label>
+              <select id="agenteExt-${empresa.id}">
+                <option value="">Selecione</option>
+                <option>PQS</option><option>CO2</option><option>Água</option><option>Espuma</option>
+              </select>
+            </div>
+            <div><label>Capacidade</label><input type="text" id="capacidadeExt-${empresa.id}"></div>
+            <div><label>Validade da Recarga</label><input type="date" id="validadeRecarga-${empresa.id}"></div>
+            <div><label>Validade do Hidrostático</label><input type="date" id="validadeHidro-${empresa.id}"></div>
+          </div>
+          <button onclick="adicionarExtintor('${empresa.id}')">ADICIONAR EXTINTOR</button>
+          <table>
+            <thead><tr>
+              <th>Número</th><th>Agente</th><th>Capacidade</th>
+              <th>Val. Recarga</th><th>Status Recarga</th>
+              <th>Val. Hidrostático</th><th>Status Hidrostático</th><th>Ações</th>
+            </tr></thead>
+            <tbody>
+    `;
+
+    empresa.extintores.forEach((ext, index) => {
+      const sR = calcularStatus(ext.validadeRecarga);
+      const sH = calcularStatus(ext.validadeHidro);
+      html += `<tr>
+        <td>${ext.numero}</td><td>${ext.agente}</td><td>${ext.capacidade}</td>
+        <td>${ext.validadeRecarga}</td><td class="${sR.classe}">${sR.texto}</td>
+        <td>${ext.validadeHidro}</td><td class="${sH.classe}">${sH.texto}</td>
+        <td>
+          <button onclick="editarExtintor('${empresa.id}',${index})">Editar</button>
+          <button onclick="excluirExtintor('${empresa.id}',${index})">Excluir</button>
+        </td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>
+          <div style="margin-top:25px;text-align:right;">
+            <button class="btn-verde" onclick="concluirEmpresa('${empresa.id}')">
+              💾 SALVAR EMPRESA NO SISTEMA
+            </button>
+          </div>
+        </div>
+      </div>`;
+
+    lista.innerHTML += html;
+  });
+}
+
+// ============ PESQUISA ============
+
+function pesquisarEmpresas() {
+  const termo = (document.getElementById('campoPesquisa').value || '').toLowerCase().trim();
+  const banco = carregarBanco();
+  const resultados = termo
+    ? banco.filter(e =>
+        e.nome.toLowerCase().includes(termo) ||
+        (e.cnpj || '').toLowerCase().includes(termo) ||
+        (e.responsavel || '').toLowerCase().includes(termo) ||
+        (e.email || '').toLowerCase().includes(termo)
+      )
+    : banco;
+
+  const div = document.getElementById('resultadosPesquisa');
+
+  if (resultados.length === 0) {
+    div.innerHTML = `<div class="aviso-vazio">${banco.length === 0 ? '📂 Nenhuma empresa salva ainda.' : '🔎 Nenhuma empresa encontrada para "' + termo + '".'}</div>`;
+    return;
+  }
+
+  div.innerHTML = resultados.map(e => {
+    const totalDocs = e.documentos.length;
+    const totalExt = e.extintores.length;
+    const vencidos = [...e.documentos.map(d => calcularStatus(d.validade)), ...e.extintores.flatMap(x => [calcularStatus(x.validadeRecarga), calcularStatus(x.validadeHidro)])].filter(s => s.classe === 'vencido').length;
+    const alertaBadge = vencidos > 0 ? `<span style="color:#b30000;font-weight:bold;">⚠️ ${vencidos} vencido(s)</span>` : `<span style="color:#1a7a1a;">✅ Tudo em dia</span>`;
+
+    // Hierarquia
+    let hierarquiaBadge = '';
+    if (e.cnpjPrincipal) {
+      const banco2 = carregarBanco();
+      const matriz = banco2.find(m => normalizarCNPJ(m.cnpj) === normalizarCNPJ(e.cnpjPrincipal));
+      const nomeMatriz = matriz ? matriz.nome : e.cnpjPrincipal;
+      hierarquiaBadge = `<span style="background:#fff0b3;color:#7a5800;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏭 FILIAL de ${nomeMatriz}</span>`;
+    } else {
+      // Verifica se tem filiais
+      const banco2 = carregarBanco();
+      const filiais = banco2.filter(f => normalizarCNPJ(f.cnpjPrincipal) === normalizarCNPJ(e.cnpj) && e.cnpj);
+      if (filiais.length > 0) {
+        hierarquiaBadge = `<span style="background:#e6f0ff;color:#003580;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏢 MATRIZ (${filiais.length} filial(is))</span>`;
+      }
+    }
+
+    return `
+      <div class="resultado-item" onclick="abrirDetalhe('${e.id}')">
+        <h3>🏢 ${e.nome} ${hierarquiaBadge}</h3>
+        <p><b>CNPJ:</b> ${e.cnpj || '-'} | <b>Responsável:</b> ${e.responsavel || '-'} | <b>WhatsApp:</b> ${e.whatsapp || '-'}</p>
+        <p><b>Documentos:</b> ${totalDocs} | <b>Extintores:</b> ${totalExt} | ${alertaBadge}</p>
+      </div>`;
+  }).join('');
+}
+
+function limparPesquisa() {
+  document.getElementById('campoPesquisa').value = '';
+  pesquisarEmpresas();
+}
+
+// ============ DETALHE / EDIÇÃO ============
+
+let empresaDetalhe = null;
+
+function abrirDetalhe(id) {
+  const banco = carregarBanco();
+  empresaDetalhe = JSON.parse(JSON.stringify(banco.find(e => e.id === id))); // deep copy
+  renderizarDetalhe();
+  document.getElementById('detalheOverlay').classList.add('aberto');
+}
+
+function fecharDetalhe() {
+  document.getElementById('detalheOverlay').classList.remove('aberto');
+  empresaDetalhe = null;
+}
+
+function renderizarDetalhe() {
+  const e = empresaDetalhe;
+
+  // Hierarquia
+  const banco = carregarBanco();
+  let hierarquiaHtml = '';
+  if (e.cnpjPrincipal) {
+    const matriz = banco.find(m => normalizarCNPJ(m.cnpj) === normalizarCNPJ(e.cnpjPrincipal));
+    const nomeMatriz = matriz ? matriz.nome : e.cnpjPrincipal;
+    const linkMatriz = matriz ? `<span style="color:#0055aa;cursor:pointer;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${matriz.id}'),200)">🔗 Ver Matriz</span>` : '';
+    hierarquiaHtml = `<div style="background:#fff8e1;border-left:4px solid #f9a825;padding:10px 16px;border-radius:6px;margin-bottom:16px;">
+      🏭 <b>FILIAL</b> — pertence à Matriz: <b>${nomeMatriz}</b> (CNPJ: ${e.cnpjPrincipal}) ${linkMatriz}
+    </div>`;
+  } else if (e.cnpj) {
+    const filiais = banco.filter(f => normalizarCNPJ(f.cnpjPrincipal) === normalizarCNPJ(e.cnpj) && f.id !== e.id);
+    if (filiais.length > 0) {
+      const listaFiliais = filiais.map(f => `<li style="cursor:pointer;color:#0055aa;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${f.id}'),200)">${f.nome} — ${f.cnpj || 'CNPJ não informado'}</li>`).join('');
+      hierarquiaHtml = `<div style="background:#e8f0fe;border-left:4px solid #1a73e8;padding:10px 16px;border-radius:6px;margin-bottom:16px;">
+        🏢 <b>MATRIZ</b> — ${filiais.length} filial(is) vinculada(s):<ul style="margin:6px 0 0 16px;padding:0;">${listaFiliais}</ul>
+      </div>`;
+    }
+  }
+
+  let html = `
+    <div class="empresa-titulo">${e.nome}</div>
+    ${hierarquiaHtml}
+    <div class="grid" style="margin-bottom:20px;">
+      <p><b>ID:</b> ${e.id}</p>
+      <p><b>Responsável:</b> ${e.responsavel}</p>
+      <p><b>Telefone:</b> ${e.telefone}</p>
+      <p><b>WhatsApp:</b> ${e.whatsapp}</p>
+      <p><b>Email:</b> ${e.email}</p>
+      <p><b>CNPJ:</b> ${e.cnpj}</p>
+      <p><b>CNPJ Principal (Matriz):</b> ${e.cnpjPrincipal || '—'}</p>
+      <p><b>Observações:</b> ${e.obs}</p>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+      <button class="btn-azul" onclick="editarDadosEmpresa()">✏️ EDITAR DADOS DA EMPRESA</button>
+      <button class="btn-verde" onclick="salvarDetalheNoBanco()">💾 SALVAR ALTERAÇÕES</button>
+      <button style="background:#8b0000;margin-top:0;" onclick="excluirEmpresa('${e.id}')">🗑️ EXCLUIR EMPRESA</button>
+    </div>
+
+    <div class="secao">
+      <h2>Documentos</h2>
+      <div class="grid">
+        <div><label>Número do Documento</label><input type="text" id="det-numeroDocumento"></div>
+        <div>
+          <label>Tipo de Documento</label>
+          <select id="det-tipoDoc" onchange="toggleBrigadaDetalhe()">
+            <option>Certificado de Conformidade</option>
+            <option>Atestado de Brigada de Incêndio</option>
+            <option>AVCB</option><option>Laudo Técnico</option>
+            <option>Treinamento de Brigada</option><option>Plano de Emergência</option>
+          </select>
+        </div>
+        <div><label>Data de Emissão</label><input type="date" id="det-emissaoDoc"></div>
+        <div>
+          <label>Tipo de Validade</label>
+          <select id="det-tipoValidadeDoc"><option value="meses">Meses</option><option value="anos">Anos</option></select>
+        </div>
+        <div><label>Quantidade</label><input type="number" id="det-quantidadeValidadeDoc"></div>
+      </div>
+      <div id="det-brigadaBox" style="display:none;margin-top:20px;">
+        <label>Participantes da Brigada</label>
+        <textarea id="det-participantes" placeholder="Digite um participante por linha"></textarea>
+      </div>
+      <button onclick="adicionarDocumentoDetalhe()">ADICIONAR DOCUMENTO</button>
+      <table><thead><tr>
+        <th>Tipo</th><th>Nº Doc</th><th>Participantes</th>
+        <th>Emissão</th><th>Periodicidade</th><th>Validade</th><th>Status</th><th>Ações</th>
+      </tr></thead><tbody>
+  `;
+
+  e.documentos.forEach((doc, index) => {
+    const status = calcularStatus(doc.validade);
+    html += `<tr>
+      <td>${doc.tipo}</td><td>${doc.numeroDocumento}</td>
+      <td style="white-space:pre-line;text-align:left;">${doc.participantes || '-'}</td>
+      <td>${doc.emissao}</td><td>${doc.quantidade} ${doc.tipoValidade}</td>
+      <td>${doc.validade}</td>
+      <td class="${status.classe}">${status.texto}</td>
+      <td>
+        <button onclick="editarDocumentoDetalhe(${index})">Editar</button>
+        <button onclick="excluirDocumentoDetalhe(${index})">Excluir</button>
+      </td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+
+    <div class="secao">
+      <h2>Extintores</h2>
+      <div class="grid">
+        <div><label>Número</label><input type="text" id="det-numeroExt"></div>
+        <div>
+          <label>Agente</label>
+          <select id="det-agenteExt">
+            <option value="">Selecione</option>
+            <option>PQS</option><option>CO2</option><option>Água</option><option>Espuma</option>
+          </select>
+        </div>
+        <div><label>Capacidade</label><input type="text" id="det-capacidadeExt"></div>
+        <div><label>Val. Recarga</label><input type="date" id="det-validadeRecarga"></div>
+        <div><label>Val. Hidrostático</label><input type="date" id="det-validadeHidro"></div>
+      </div>
+      <button onclick="adicionarExtintorDetalhe()">ADICIONAR EXTINTOR</button>
+      <table><thead><tr>
+        <th>Número</th><th>Agente</th><th>Capacidade</th>
+        <th>Val. Recarga</th><th>Status Recarga</th>
+        <th>Val. Hidrostático</th><th>Status Hidrostático</th><th>Ações</th>
+      </tr></thead><tbody>
+  `;
+
+  e.extintores.forEach((ext, index) => {
+    const sR = calcularStatus(ext.validadeRecarga);
+    const sH = calcularStatus(ext.validadeHidro);
+    html += `<tr>
+      <td>${ext.numero}</td><td>${ext.agente}</td><td>${ext.capacidade}</td>
+      <td>${ext.validadeRecarga}</td><td class="${sR.classe}">${sR.texto}</td>
+      <td>${ext.validadeHidro}</td><td class="${sH.classe}">${sH.texto}</td>
+      <td>
+        <button onclick="editarExtintorDetalhe(${index})">Editar</button>
+        <button onclick="excluirExtintorDetalhe(${index})">Excluir</button>
+      </td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>
+      <div style="margin-top:25px;text-align:right;">
+        <button class="btn-verde" onclick="salvarDetalheNoBanco()">💾 SALVAR TODAS AS ALTERAÇÕES</button>
+      </div>
+    </div>`;
+
+  document.getElementById('detalheConteudo').innerHTML = html;
+}
+
+function toggleBrigadaDetalhe() {
+  const tipo = document.getElementById('det-tipoDoc').value;
+  document.getElementById('det-brigadaBox').style.display =
+    tipo === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
+}
+
+function adicionarDocumentoDetalhe() {
+  const tipo = document.getElementById('det-tipoDoc').value;
+  const numeroDocumento = document.getElementById('det-numeroDocumento').value;
+  const participantes = document.getElementById('det-participantes').value;
+  const emissao = document.getElementById('det-emissaoDoc').value;
+  const tipoValidade = document.getElementById('det-tipoValidadeDoc').value;
+  const quantidade = parseInt(document.getElementById('det-quantidadeValidadeDoc').value);
+
+  if (!numeroDocumento || !emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+
+  let dataValidade = new Date(emissao);
+  if (tipoValidade === 'anos') dataValidade.setFullYear(dataValidade.getFullYear() + quantidade);
+  else dataValidade.setMonth(dataValidade.getMonth() + quantidade);
+  const validade = dataValidade.toISOString().split('T')[0];
+
+  empresaDetalhe.documentos.push({ tipo, numeroDocumento, participantes, emissao, validade, tipoValidade, quantidade });
+  renderizarDetalhe();
+}
+
+function adicionarExtintorDetalhe() {
+  const numero = document.getElementById('det-numeroExt').value;
+  const agente = document.getElementById('det-agenteExt').value;
+  const capacidade = document.getElementById('det-capacidadeExt').value;
+  const validadeRecarga = document.getElementById('det-validadeRecarga').value;
+  const validadeHidro = document.getElementById('det-validadeHidro').value;
+  if (!numero) { mostrarToast('Informe o número do extintor.', true); return; }
+  empresaDetalhe.extintores.push({ numero, agente, capacidade, validadeRecarga, validadeHidro });
+  renderizarDetalhe();
+}
+
+function editarDocumentoDetalhe(index) {
+  const doc = empresaDetalhe.documentos[index];
+  const novoNumero = prompt('Editar número do documento:', doc.numeroDocumento);
+  if (novoNumero !== null) doc.numeroDocumento = novoNumero;
+  const novosParticipantes = prompt('Editar participantes:', doc.participantes || '');
+  if (novosParticipantes !== null) doc.participantes = novosParticipantes;
+  renderizarDetalhe();
+}
+
+function excluirDocumentoDetalhe(index) {
+  if (!confirm('Excluir este documento?')) return;
+  empresaDetalhe.documentos.splice(index, 1);
+  renderizarDetalhe();
+}
+
+function editarExtintorDetalhe(index) {
+  const ext = empresaDetalhe.extintores[index];
+  const novoNumero = prompt('Editar número do extintor:', ext.numero);
+  if (novoNumero !== null) ext.numero = novoNumero;
+  const novaCapacidade = prompt('Editar capacidade:', ext.capacidade);
+  if (novaCapacidade !== null) ext.capacidade = novaCapacidade;
+  renderizarDetalhe();
+}
+
+function excluirExtintorDetalhe(index) {
+  if (!confirm('Excluir este extintor?')) return;
+  empresaDetalhe.extintores.splice(index, 1);
+  renderizarDetalhe();
+}
+
+function editarDadosEmpresa() {
+  const e = empresaDetalhe;
+  const novoNome = prompt('Nome da empresa:', e.nome); if (novoNome !== null) e.nome = novoNome;
+  const novoResp = prompt('Responsável:', e.responsavel); if (novoResp !== null) e.responsavel = novoResp;
+  const novoTel = prompt('Telefone:', e.telefone); if (novoTel !== null) e.telefone = novoTel;
+  const novoWA = prompt('WhatsApp:', e.whatsapp); if (novoWA !== null) e.whatsapp = novoWA;
+  const novoEmail = prompt('Email:', e.email); if (novoEmail !== null) e.email = novoEmail;
+  const novoCNPJ = prompt('CNPJ:', e.cnpj); if (novoCNPJ !== null) e.cnpj = novoCNPJ;
+  const novoCNPJPrincipal = prompt('CNPJ Principal (Matriz) — deixe em branco para empresa independente:', e.cnpjPrincipal || '');
+  if (novoCNPJPrincipal !== null) e.cnpjPrincipal = novoCNPJPrincipal.trim();
+  const novoObs = prompt('Observações:', e.obs); if (novoObs !== null) e.obs = novoObs;
+  renderizarDetalhe();
+}
+
+function salvarDetalheNoBanco() {
+  salvarNoBanco(empresaDetalhe);
+  mostrarToast(`✅ "${empresaDetalhe.nome}" atualizada com sucesso!`);
+  popularSelectMatriz();
+  pesquisarEmpresas();
+}
+
+function excluirEmpresa(id) {
+  if (!confirm('Tem certeza que deseja EXCLUIR esta empresa e todos os seus dados?')) return;
+  excluirDoBanco(id);
+  mostrarToast('Empresa excluída.');
+  popularSelectMatriz();
+  fecharDetalhe();
+  pesquisarEmpresas();
+}
+
+// Inicialização
+popularSelectMatriz();
+</script>
+</body>
+</html>
