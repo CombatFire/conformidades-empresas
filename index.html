@@ -64,38 +64,125 @@
     /* Toast */
     #toast { position:fixed; bottom:30px; right:30px; background:#1a7a1a; color:white; padding:14px 24px; border-radius:10px; font-weight:bold; font-size:15px; display:none; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
     #toast.erro { background:#b30000; }
+
+    /* HEADER com ações */
+    header { display:flex; align-items:center; justify-content:center; gap:20px; position:relative; }
+    .header-actions { position:absolute; right:20px; display:flex; gap:10px; }
+    .header-actions button { margin-top:0; font-size:13px; padding:8px 14px; background:rgba(0,0,0,0.25); }
+    .header-actions button:hover { background:rgba(0,0,0,0.4); opacity:1; }
+
+    /* BARRA DE FERRAMENTAS (backup) */
+    .toolbar { background:#fff; border-bottom:1px solid #e2e2e2; padding:12px 20px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:flex-end; }
+    .toolbar .toolbar-label { margin-right:auto; color:#888; font-size:13px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; }
+    .toolbar button { margin-top:0; font-size:14px; padding:9px 16px; }
+
+    /* LOGIN */
+    #loginOverlay { position:fixed; inset:0; background:linear-gradient(135deg,#8b0000,#b30000); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .login-card { background:white; border-radius:16px; padding:36px 32px; width:100%; max-width:380px; box-shadow:0 12px 40px rgba(0,0,0,0.35); text-align:center; }
+    .login-card .logo { font-size:40px; }
+    .login-card h2 { margin:8px 0 4px; }
+    .login-card p.sub { color:#777; font-size:14px; margin:0 0 24px; }
+    .login-card label { text-align:left; }
+    .login-card input { margin-bottom:6px; }
+    .login-card button { width:100%; padding:14px; font-size:16px; margin-top:14px; }
+    .login-erro { color:#b30000; font-weight:bold; font-size:14px; min-height:20px; margin-top:6px; }
+    .login-hint { background:#fff0b3; color:#7a5800; border-radius:8px; padding:10px 12px; font-size:13px; margin-top:16px; text-align:left; }
+
+    /* MODAL GENÉRICO (alterar senha) */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:6000; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.aberto { display:flex; }
+    .modal-box { background:white; border-radius:14px; padding:28px; width:100%; max-width:420px; box-shadow:0 12px 40px rgba(0,0,0,0.35); }
+    .modal-box h2 { margin-top:0; }
+    .modal-box .modal-acoes { display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+    .modal-box .modal-acoes button { margin-top:0; }
+
+    /* ALERTAS */
+    .alerta-badge { display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 6px; margin-left:8px; border-radius:11px; background:#ffcc00; color:#7a3b00; font-size:13px; font-weight:bold; vertical-align:middle; }
+    .alerta-badge.tem-vencido { background:#ffe14d; color:#8b0000; }
+    .alerta-filtros { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:10px 0 20px; }
+    .alerta-grupo-titulo { font-size:18px; font-weight:bold; margin:24px 0 10px; padding-bottom:6px; border-bottom:2px solid #eee; }
+    .alerta-grupo-titulo.vencidos { color:#b30000; }
+    .alerta-grupo-titulo.breve { color:#a06a00; }
+    .alerta-item { display:flex; align-items:center; gap:14px; background:white; border-radius:8px; padding:12px 16px; margin-bottom:10px; box-shadow:0 0 6px rgba(0,0,0,0.08); border-left:6px solid #ccc; }
+    .alerta-item.vencido { border-left-color:#b30000; }
+    .alerta-item.breve { border-left-color:#ffcc00; }
+    .alerta-item .ai-info { flex:1; }
+    .alerta-item .ai-edif { font-weight:bold; color:#222; font-size:15px; cursor:pointer; }
+    .alerta-item .ai-edif:hover { color:#b30000; text-decoration:underline; }
+    .alerta-item .ai-desc { font-size:13px; color:#666; margin-top:2px; }
+    .alerta-item .ai-status { font-size:13px; font-weight:bold; padding:4px 10px; border-radius:14px; white-space:nowrap; }
+    .alerta-item .ai-status.vencido { background:#ffcccc; color:#b30000; }
+    .alerta-item .ai-status.breve { background:#fff0b3; color:#7a5800; }
+    .alerta-item .ai-acoes button { margin-top:0; padding:7px 12px; font-size:13px; }
+    .alerta-resumo { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+    .alerta-resumo .chip { padding:8px 14px; border-radius:10px; font-weight:bold; font-size:14px; }
+    .alerta-resumo .chip.vencido { background:#ffe6e6; color:#b30000; }
+    .alerta-resumo .chip.breve { background:#fff7d6; color:#a06a00; }
+    .alerta-resumo .chip.ok { background:#e6f7e6; color:#1a7a1a; }
+
+    @media print { .no-print { display:none !important; } }
   </style>
 </head>
 <body>
 
-<header>COMBAT FIRE - SISTEMA DE CONFORMIDADE</header>
+<!-- ===== TELA DE LOGIN ===== -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="logo">🔥</div>
+    <h2>COMBAT FIRE</h2>
+    <p class="sub">Sistema de Conformidade — Acesso Restrito</p>
+    <label>Senha de administrador</label>
+    <input type="password" id="loginSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter') fazerLogin()">
+    <div class="login-erro" id="loginErro"></div>
+    <button onclick="fazerLogin()">ENTRAR</button>
+    <div class="login-hint" id="loginHint" style="display:none;">
+      🔑 Senha padrão inicial: <b>admin123</b><br>Entre e troque a senha em <b>"Alterar senha"</b>.
+    </div>
+  </div>
+</div>
+
+<header>
+  <span>COMBAT FIRE - SISTEMA DE CONFORMIDADE</span>
+  <div class="header-actions" id="headerActions" style="display:none;">
+    <button onclick="abrirAlterarSenha()">🔒 Alterar senha</button>
+    <button onclick="logout()">↩️ Sair</button>
+  </div>
+</header>
+
+<div class="toolbar no-print">
+  <span class="toolbar-label">💾 Backup dos dados</span>
+  <button class="btn-azul" onclick="exportarBackup()">⬇️ Exportar backup</button>
+  <button class="btn-cinza" onclick="document.getElementById('inputImportar').click()">⬆️ Importar backup</button>
+  <input type="file" id="inputImportar" accept="application/json,.json" style="display:none" onchange="importarBackup(event)">
+</div>
 
 <div class="tabs">
-  <button class="tab-btn ativo" onclick="mudarAba('cadastro')">➕ CADASTRAR EMPRESA</button>
-  <button class="tab-btn" onclick="mudarAba('pesquisa')">🔍 PESQUISAR EMPRESAS</button>
+  <button class="tab-btn ativo" onclick="mudarAba('cadastro')">➕ CADASTRAR EDIFICAÇÃO</button>
+  <button class="tab-btn" onclick="mudarAba('pesquisa')">🔍 PESQUISAR EDIFICAÇÕES</button>
+  <button class="tab-btn" onclick="mudarAba('alertas')">🔔 ALERTAS<span id="alertaContador" class="alerta-badge" style="display:none;"></span></button>
 </div>
 
 <!-- ===== ABA CADASTRO ===== -->
 <div id="aba-cadastro" class="pagina ativa">
   <div class="container">
     <div class="card">
-      <h2>Cadastrar Empresa</h2>
+      <h2>Cadastrar Edificação</h2>
       <div class="grid">
-        <div><label>Empresa</label><input type="text" id="empresa"></div>
+        <div><label>Edificação</label><input type="text" id="empresa"></div>
         <div><label>Responsável</label><input type="text" id="responsavel"></div>
         <div><label>Telefone</label><input type="text" id="telefone"></div>
         <div><label>WhatsApp</label><input type="text" id="whatsapp"></div>
         <div><label>Email</label><input type="email" id="email"></div>
         <div><label>CNPJ</label><input type="text" id="cnpj" placeholder="00.000.000/0000-00"></div>
         <div>
-          <label>CNPJ Principal (Matriz) <span style="font-weight:normal;color:#888;">— opcional, para filiais</span></label>
-          <select id="cnpjPrincipal">
-            <option value="">Nenhum (empresa independente)</option>
+          <label>Edificação Gestora <span style="font-weight:normal;color:#888;">— opcional</span></label>
+          <select id="gestora">
+            <option value="">Nenhuma (edificação independente)</option>
           </select>
         </div>
         <div><label>Observações</label><input type="text" id="obs"></div>
       </div>
-      <button onclick="cadastrarEmpresa()">CADASTRAR EMPRESA</button>
+      <button onclick="cadastrarEmpresa()">CADASTRAR EDIFICAÇÃO</button>
     </div>
     <div id="listaEmpresas"></div>
   </div>
@@ -105,13 +192,30 @@
 <div id="aba-pesquisa" class="pagina">
   <div class="container">
     <div class="card">
-      <h2>Pesquisar Empresas Cadastradas</h2>
+      <h2>Pesquisar Edificações Cadastradas</h2>
       <div class="search-bar">
         <input type="text" id="campoPesquisa" placeholder="Buscar por nome, CNPJ, responsável ou email..." oninput="pesquisarEmpresas()">
         <button onclick="pesquisarEmpresas()">BUSCAR</button>
         <button class="btn-cinza" onclick="limparPesquisa()">LIMPAR</button>
       </div>
       <div id="resultadosPesquisa"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ABA ALERTAS ===== -->
+<div id="aba-alertas" class="pagina">
+  <div class="container">
+    <div class="card">
+      <h2>🔔 Alertas de Vencimento</h2>
+      <p style="color:#666;margin-top:-6px;">Documentos, certificados e extintores vencidos ou que vencem nos próximos 30 dias.</p>
+      <div class="alerta-filtros">
+        <label style="display:inline-flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer;">
+          <input type="number" id="alertaDias" value="30" min="1" style="width:70px;padding:6px;"> dias de antecedência
+        </label>
+        <button class="btn-cinza" onclick="renderizarAlertas()" style="margin-top:0;">Atualizar</button>
+      </div>
+      <div id="conteudoAlertas"></div>
     </div>
   </div>
 </div>
@@ -124,6 +228,21 @@
   </div>
 </div>
 
+<!-- ===== MODAL ALTERAR SENHA ===== -->
+<div id="senhaOverlay" class="modal-overlay">
+  <div class="modal-box">
+    <h2>🔒 Alterar senha</h2>
+    <div><label>Senha atual</label><input type="password" id="senhaAtual"></div>
+    <div style="margin-top:12px;"><label>Nova senha</label><input type="password" id="senhaNova"></div>
+    <div style="margin-top:12px;"><label>Confirmar nova senha</label><input type="password" id="senhaConfirma"></div>
+    <div class="login-erro" id="senhaErro"></div>
+    <div class="modal-acoes">
+      <button class="btn-cinza" onclick="fecharAlterarSenha()">Cancelar</button>
+      <button class="btn-verde" onclick="salvarNovaSenha()">Salvar nova senha</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -131,6 +250,315 @@
 
 let empresas = []; // em edição no formulário
 let empresaSendoEditada = null; // ID da empresa aberta no overlay de edição
+
+// ============ LOGIN ADMINISTRATIVO ============
+// Observação: por ser um sistema 100% local (no navegador), este login é uma
+// barreira de acesso para o uso diário — não é uma proteção criptográfica forte.
+
+const SENHA_PADRAO = 'admin123';
+
+function hashSenha(s) {
+  let h = 5381;
+  const str = 'combatfire$' + s;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h) + str.charCodeAt(i);
+    h = h & 0xffffffff;
+  }
+  return (h >>> 0).toString(16);
+}
+
+function inicializarSenha() {
+  try {
+    if (!localStorage.getItem('combatfire_admin_hash')) {
+      localStorage.setItem('combatfire_admin_hash', hashSenha(SENHA_PADRAO));
+    }
+  } catch (e) {}
+}
+
+function senhaArmazenada() {
+  try { return localStorage.getItem('combatfire_admin_hash') || hashSenha(SENHA_PADRAO); }
+  catch (e) { return hashSenha(SENHA_PADRAO); }
+}
+
+function estaUsandoSenhaPadrao() {
+  return senhaArmazenada() === hashSenha(SENHA_PADRAO);
+}
+
+function verificarAutenticacao() {
+  let autenticado = false;
+  try { autenticado = sessionStorage.getItem('combatfire_auth') === 'ok'; } catch (e) {}
+  if (autenticado) {
+    revelarApp();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('headerActions').style.display = 'none';
+    document.getElementById('loginHint').style.display = estaUsandoSenhaPadrao() ? 'block' : 'none';
+    setTimeout(() => { const c = document.getElementById('loginSenha'); if (c) c.focus(); }, 100);
+  }
+}
+
+function revelarApp() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('headerActions').style.display = 'flex';
+  popularSelectMatriz();
+  atualizarContadorAlertas();
+}
+
+function fazerLogin() {
+  const senha = document.getElementById('loginSenha').value;
+  const erro = document.getElementById('loginErro');
+  if (hashSenha(senha) === senhaArmazenada()) {
+    try { sessionStorage.setItem('combatfire_auth', 'ok'); } catch (e) {}
+    document.getElementById('loginSenha').value = '';
+    erro.textContent = '';
+    revelarApp();
+    mostrarToast('✅ Acesso liberado.');
+  } else {
+    erro.textContent = '❌ Senha incorreta.';
+    document.getElementById('loginSenha').value = '';
+    document.getElementById('loginSenha').focus();
+  }
+}
+
+function logout() {
+  try { sessionStorage.removeItem('combatfire_auth'); } catch (e) {}
+  fecharDetalhe();
+  verificarAutenticacao();
+}
+
+function abrirAlterarSenha() {
+  document.getElementById('senhaAtual').value = '';
+  document.getElementById('senhaNova').value = '';
+  document.getElementById('senhaConfirma').value = '';
+  document.getElementById('senhaErro').textContent = '';
+  document.getElementById('senhaOverlay').classList.add('aberto');
+}
+
+function fecharAlterarSenha() {
+  document.getElementById('senhaOverlay').classList.remove('aberto');
+}
+
+function salvarNovaSenha() {
+  const atual = document.getElementById('senhaAtual').value;
+  const nova = document.getElementById('senhaNova').value;
+  const confirma = document.getElementById('senhaConfirma').value;
+  const erro = document.getElementById('senhaErro');
+
+  if (hashSenha(atual) !== senhaArmazenada()) { erro.textContent = '❌ Senha atual incorreta.'; return; }
+  if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
+  if (nova !== confirma) { erro.textContent = '❌ A confirmação não coincide com a nova senha.'; return; }
+
+  try {
+    localStorage.setItem('combatfire_admin_hash', hashSenha(nova));
+    fecharAlterarSenha();
+    mostrarToast('✅ Senha alterada com sucesso!');
+  } catch (e) {
+    erro.textContent = '❌ Não foi possível salvar a senha neste navegador.';
+  }
+}
+
+// ============ EXPORTAR / IMPORTAR BACKUP ============
+
+function exportarBackup() {
+  const banco = carregarBanco();
+  const payload = {
+    sistema: 'COMBAT FIRE - Sistema de Conformidade',
+    versao: 1,
+    exportadoEm: new Date().toISOString(),
+    totalEmpresas: banco.length,
+    empresas: banco
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const hoje = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `combatfire_backup_${hoje}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  mostrarToast(`⬇️ Backup exportado (${banco.length} edificação(ões)).`);
+}
+
+function importarBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (ev) {
+    let dados;
+    try { dados = JSON.parse(ev.target.result); }
+    catch (e) { mostrarToast('❌ Arquivo inválido (não é um JSON válido).', true); event.target.value = ''; return; }
+
+    const lista = Array.isArray(dados) ? dados : (Array.isArray(dados.empresas) ? dados.empresas : null);
+    if (!lista) { mostrarToast('❌ Backup não reconhecido.', true); event.target.value = ''; return; }
+
+    const validas = lista.filter(e => e && e.id && e.nome);
+    if (validas.length === 0) { mostrarToast('❌ Nenhuma edificação válida no arquivo.', true); event.target.value = ''; return; }
+    validas.forEach(e => { e.documentos = e.documentos || []; e.extintores = e.extintores || []; });
+    const substituir = confirm(
+      `Importar ${validas.length} edificação(ões).\n\n` +
+      `OK = SUBSTITUIR todos os dados atuais pelo backup.\n` +
+      `Cancelar = MESCLAR (manter os atuais e adicionar/atualizar os do backup).`
+    );
+
+    let banco;
+    if (substituir) {
+      banco = validas;
+    } else {
+      banco = carregarBanco();
+      validas.forEach(nova => {
+        const idx = banco.findIndex(e => e.id === nova.id);
+        if (idx >= 0) banco[idx] = nova; else banco.push(nova);
+      });
+    }
+
+    try {
+      localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+      migrarParaGestoraId();
+      mostrarToast(`⬆️ Backup importado: ${validas.length} edificação(ões) (${substituir ? 'substituição' : 'mesclagem'}).`);
+      popularSelectMatriz();
+      pesquisarEmpresas();
+      atualizarContadorAlertas();
+      renderizarAlertas();
+    } catch (e) {
+      mostrarToast('❌ Não foi possível salvar os dados importados.', true);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ============ RELATÓRIO PDF ============
+
+function formatarDataBR(iso) {
+  if (!iso) return '—';
+  const p = String(iso).split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+  return iso;
+}
+
+function corStatus(classe) {
+  if (classe === 'vencido') return { bg: '#ffcccc', txt: '#b30000' };
+  if (classe === 'breve')   return { bg: '#fff0b3', txt: '#7a5800' };
+  return { bg: '#ccffcc', txt: '#1a7a1a' };
+}
+
+function gerarRelatorioPDF() {
+  const e = empresaDetalhe;
+  if (!e) return;
+
+  let docsHtml = '';
+  if (e.documentos.length === 0) {
+    docsHtml = `<tr><td colspan="6" class="vazio">Nenhum documento cadastrado.</td></tr>`;
+  } else {
+    e.documentos.forEach(doc => {
+      const s = calcularStatus(doc.validade);
+      const c = corStatus(s.classe);
+      docsHtml += `<tr>
+        <td>${doc.tipo || '—'}</td>
+        <td>${doc.numeroDocumento || '—'}</td>
+        <td style="white-space:pre-line;text-align:left;">${doc.participantes || '—'}</td>
+        <td>${formatarDataBR(doc.emissao)}</td>
+        <td>${formatarDataBR(doc.validade)}</td>
+        <td style="background:${c.bg};color:${c.txt};font-weight:bold;">${s.texto}</td>
+      </tr>`;
+    });
+  }
+
+  let extHtml = '';
+  if (e.extintores.length === 0) {
+    extHtml = `<tr><td colspan="7" class="vazio">Nenhum extintor cadastrado.</td></tr>`;
+  } else {
+    e.extintores.forEach(ext => {
+      const sR = calcularStatus(ext.validadeRecarga); const cR = corStatus(sR.classe);
+      const sH = calcularStatus(ext.validadeHidro);   const cH = corStatus(sH.classe);
+      extHtml += `<tr>
+        <td>${ext.numero || '—'}</td>
+        <td>${ext.agente || '—'}</td>
+        <td>${ext.capacidade || '—'}</td>
+        <td>${formatarDataBR(ext.validadeRecarga)}</td>
+        <td style="background:${cR.bg};color:${cR.txt};font-weight:bold;">${sR.texto}</td>
+        <td>${formatarDataBR(ext.validadeHidro)}</td>
+        <td style="background:${cH.bg};color:${cH.txt};font-weight:bold;">${sH.texto}</td>
+      </tr>`;
+    });
+  }
+
+  const totalVencidos = [
+    ...e.documentos.map(d => calcularStatus(d.validade)),
+    ...e.extintores.flatMap(x => [calcularStatus(x.validadeRecarga), calcularStatus(x.validadeHidro)])
+  ].filter(s => s.classe === 'vencido').length;
+
+  const agora = new Date();
+  const dataGeracao = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  const resumoCor = totalVencidos > 0 ? '#b30000' : '#1a7a1a';
+  const resumoTxt = totalVencidos > 0
+    ? `⚠️ ${totalVencidos} item(ns) VENCIDO(S) — requer atenção`
+    : '✅ Nenhum item vencido';
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+    <title>Relatório - ${e.nome}</title>
+    <style>
+      * { box-sizing:border-box; }
+      body { font-family:Arial, sans-serif; color:#222; margin:0; padding:30px; }
+      .cab { border-bottom:4px solid #b30000; padding-bottom:14px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:flex-end; }
+      .cab .marca { font-size:24px; font-weight:bold; color:#b30000; }
+      .cab .sub { font-size:13px; color:#777; }
+      h1 { font-size:22px; color:#b30000; margin:0 0 4px; }
+      .dados { display:grid; grid-template-columns:1fr 1fr; gap:4px 30px; font-size:14px; margin:14px 0 22px; }
+      .dados p { margin:3px 0; }
+      .resumo { padding:10px 14px; border-radius:8px; font-weight:bold; font-size:15px; color:${resumoCor}; background:${totalVencidos > 0 ? '#ffecec' : '#eafaea'}; margin-bottom:22px; }
+      h2 { font-size:16px; color:#b30000; border-bottom:1px solid #eee; padding-bottom:6px; margin:24px 0 10px; }
+      table { width:100%; border-collapse:collapse; font-size:12.5px; }
+      th, td { border:1px solid #ccc; padding:7px 8px; text-align:center; }
+      th { background:#b30000; color:white; }
+      td.vazio { color:#999; font-style:italic; }
+      .rodape { margin-top:30px; padding-top:12px; border-top:1px solid #ddd; font-size:11px; color:#999; text-align:center; }
+      @media print { body { padding:0; } .no-print { display:none; } }
+      .barra-print { text-align:center; margin-bottom:20px; }
+      .barra-print button { background:#b30000; color:white; border:none; padding:12px 28px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px; }
+    </style></head><body>
+    <div class="barra-print no-print">
+      <button onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+    </div>
+    <div class="cab">
+      <div><div class="marca">🔥 COMBAT FIRE</div><div class="sub">Sistema de Conformidade contra Incêndio</div></div>
+      <div class="sub">Emitido em ${dataGeracao}</div>
+    </div>
+    <h1>${e.nome}</h1>
+    <div class="dados">
+      <p><b>CNPJ:</b> ${e.cnpj || '—'}</p>
+      <p><b>Responsável:</b> ${e.responsavel || '—'}</p>
+      <p><b>Telefone:</b> ${e.telefone || '—'}</p>
+      <p><b>WhatsApp:</b> ${e.whatsapp || '—'}</p>
+      <p><b>Email:</b> ${e.email || '—'}</p>
+      <p><b>Edificação Gestora:</b> ${nomeGestoraAtual(e)}</p>
+      <p style="grid-column:1 / -1;"><b>Observações:</b> ${e.obs || '—'}</p>
+    </div>
+    <div class="resumo">${resumoTxt}</div>
+    <h2>Documentos e Atestados</h2>
+    <table><thead><tr>
+      <th>Tipo</th><th>Nº Doc</th><th>Participantes</th><th>Emissão</th><th>Validade</th><th>Status</th>
+    </tr></thead><tbody>${docsHtml}</tbody></table>
+    <h2>Extintores</h2>
+    <table><thead><tr>
+      <th>Número</th><th>Agente</th><th>Capacidade</th><th>Val. Recarga</th><th>Status Recarga</th><th>Val. Hidrostático</th><th>Status Hidro.</th>
+    </tr></thead><tbody>${extHtml}</tbody></table>
+    <div class="rodape">Relatório gerado automaticamente pelo Sistema COMBAT FIRE — ${dataGeracao}</div>
+    <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 400); };<\/script>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) {
+    mostrarToast('❌ Permita pop-ups para gerar o relatório.', true);
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
 
 function mostrarToast(msg, erro = false) {
   const t = document.getElementById('toast');
@@ -144,8 +572,141 @@ function mudarAba(aba) {
   document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
   document.getElementById('aba-' + aba).classList.add('ativa');
-  event.target.classList.add('ativo');
+  (event.currentTarget || event.target).classList.add('ativo');
   if (aba === 'pesquisa') pesquisarEmpresas();
+  if (aba === 'alertas') renderizarAlertas();
+}
+
+// ============ ALERTAS DE VENCIMENTO ============
+
+// Coleta todos os itens vencidos / a vencer de todas as edificações.
+// diasBreve = janela de antecedência (padrão 30). Itens sem data são ignorados.
+function coletarAlertas(diasBreve) {
+  const banco = carregarBanco();
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const itens = [];
+
+  function avaliar(dataValidade) {
+    if (!dataValidade) return null; // sem data não gera alerta
+    const v = new Date(dataValidade); v.setHours(0, 0, 0, 0);
+    const dias = Math.ceil((v - hoje) / (1000 * 60 * 60 * 24));
+    if (dias < 0) return { classe: 'vencido', dias };
+    if (dias <= diasBreve) return { classe: 'breve', dias };
+    return null;
+  }
+
+  banco.forEach(e => {
+    (e.documentos || []).forEach(doc => {
+      const r = avaliar(doc.validade);
+      if (r) itens.push({
+        edifId: e.id, edifNome: e.nome, whatsapp: e.whatsapp, responsavel: e.responsavel,
+        categoria: doc.tipo || 'Documento',
+        descricao: doc.numeroDocumento ? `Nº ${doc.numeroDocumento}` : 'Documento',
+        validade: doc.validade, ...r
+      });
+    });
+    (e.extintores || []).forEach(ext => {
+      const numero = ext.numero ? `Extintor nº ${ext.numero}` : 'Extintor';
+      const rR = avaliar(ext.validadeRecarga);
+      if (rR) itens.push({
+        edifId: e.id, edifNome: e.nome, whatsapp: e.whatsapp, responsavel: e.responsavel,
+        categoria: 'Extintor — Recarga', descricao: `${numero}${ext.agente ? ' (' + ext.agente + ')' : ''}`,
+        validade: ext.validadeRecarga, ...rR
+      });
+      const rH = avaliar(ext.validadeHidro);
+      if (rH) itens.push({
+        edifId: e.id, edifNome: e.nome, whatsapp: e.whatsapp, responsavel: e.responsavel,
+        categoria: 'Extintor — Teste Hidrostático', descricao: `${numero}${ext.agente ? ' (' + ext.agente + ')' : ''}`,
+        validade: ext.validadeHidro, ...rH
+      });
+    });
+  });
+
+  // Mais urgente primeiro (menos dias)
+  itens.sort((a, b) => a.dias - b.dias);
+  return itens;
+}
+
+function textoStatusAlerta(item) {
+  if (item.classe === 'vencido') {
+    const d = Math.abs(item.dias);
+    return `VENCIDO há ${d} dia${d === 1 ? '' : 's'}`;
+  }
+  if (item.dias === 0) return 'VENCE HOJE';
+  return `Vence em ${item.dias} dia${item.dias === 1 ? '' : 's'}`;
+}
+
+function avisarWhatsApp(item) {
+  const numero = (item.whatsapp || '').replace(/\D/g, '');
+  if (!numero) { mostrarToast('Esta edificação não tem WhatsApp cadastrado.', true); return; }
+  const venc = textoStatusAlerta(item).toLowerCase();
+  const msg = `Olá${item.responsavel ? ' ' + item.responsavel : ''}! Aviso de conformidade — ${item.edifNome}: ` +
+    `${item.categoria} (${item.descricao}) ${venc} (validade ${formatarDataBR(item.validade)}). ` +
+    `Favor providenciar a regularização.`;
+  window.open(`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+let _alertasAtuais = [];
+
+function renderizarAlertas() {
+  const diasInput = document.getElementById('alertaDias');
+  const diasBreve = diasInput ? Math.max(1, parseInt(diasInput.value) || 30) : 30;
+  const itens = coletarAlertas(diasBreve);
+  _alertasAtuais = itens;
+  const div = document.getElementById('conteudoAlertas');
+  if (!div) return;
+
+  const vencidos = itens.filter(i => i.classe === 'vencido');
+  const breve = itens.filter(i => i.classe === 'breve');
+
+  let html = `<div class="alerta-resumo">
+    <span class="chip vencido">🔴 ${vencidos.length} vencido(s)</span>
+    <span class="chip breve">🟡 ${breve.length} a vencer</span>
+  </div>`;
+
+  if (itens.length === 0) {
+    html += `<div class="aviso-vazio">✅ Nenhum item vencido ou a vencer nos próximos ${diasBreve} dias.</div>`;
+    div.innerHTML = html;
+    return;
+  }
+
+  function bloco(lista, titulo, classeGrupo) {
+    if (lista.length === 0) return '';
+    let h = `<div class="alerta-grupo-titulo ${classeGrupo}">${titulo} (${lista.length})</div>`;
+    lista.forEach((item, i) => {
+      const idx = _alertasAtuais.indexOf(item);
+      const btnWa = (item.whatsapp || '').replace(/\D/g, '')
+        ? `<button class="btn-verde" onclick="avisarWhatsApp(_alertasAtuais[${idx}])">📲 Avisar</button>` : '';
+      h += `<div class="alerta-item ${item.classe}">
+        <div class="ai-info">
+          <div class="ai-edif" onclick="abrirDetalhe('${item.edifId}')">🏢 ${item.edifNome}</div>
+          <div class="ai-desc">${item.categoria} • ${item.descricao} • validade ${formatarDataBR(item.validade)}</div>
+        </div>
+        <span class="ai-status ${item.classe}">${textoStatusAlerta(item)}</span>
+        <div class="ai-acoes">${btnWa}</div>
+      </div>`;
+    });
+    return h;
+  }
+
+  html += bloco(vencidos, '🔴 Vencidos', 'vencidos');
+  html += bloco(breve, '🟡 Vencem em breve', 'breve');
+  div.innerHTML = html;
+}
+
+function atualizarContadorAlertas() {
+  const badge = document.getElementById('alertaContador');
+  if (!badge) return;
+  const itens = coletarAlertas(30);
+  const total = itens.length;
+  const temVencido = itens.some(i => i.classe === 'vencido');
+  if (total === 0) {
+    badge.style.display = 'none';
+  } else {
+    badge.style.display = 'inline-flex';
+    badge.textContent = total;
+    badge.className = 'alerta-badge' + (temVencido ? ' tem-vencido' : '');
+  }
 }
 
 // ============ LOCALSTORAGE ============
@@ -189,25 +750,49 @@ function normalizarCNPJ(cnpj) {
 
 function popularSelectMatriz() {
   const banco = carregarBanco();
-  const sel = document.getElementById('cnpjPrincipal');
+  const sel = document.getElementById('gestora');
   if (!sel) return;
-  // Mantém apenas a opção padrão e rebuilda
-  sel.innerHTML = '<option value="">Nenhum (empresa independente)</option>';
-  // Só matrizes (sem cnpjPrincipal) podem ser selecionadas como principal
-  const matrizes = banco.filter(e => !e.cnpjPrincipal);
-  matrizes.forEach(e => {
-    if (e.cnpj) {
-      const opt = document.createElement('option');
-      opt.value = e.cnpj;
-      opt.textContent = `${e.nome} — ${e.cnpj}`;
-      sel.appendChild(opt);
-    }
+  sel.innerHTML = '<option value="">Nenhuma (edificação independente)</option>';
+  // Só edificações de topo (que não são geridas por outra) podem ser gestoras
+  const gestoras = banco.filter(e => !e.gestoraId);
+  gestoras.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = e.cnpj ? `${e.nome} — ${e.cnpj}` : e.nome;
+    sel.appendChild(opt);
   });
+}
+
+// Retorna o nome da edificação gestora de "e", ou '—'
+function nomeGestoraAtual(e) {
+  if (!e || !e.gestoraId) return '—';
+  const g = carregarBanco().find(b => b.id === e.gestoraId);
+  return g ? g.nome : '(gestora removida)';
+}
+
+// Converte vínculos antigos (cnpjPrincipal por CNPJ) para gestoraId (por edificação)
+function migrarParaGestoraId() {
+  try {
+    const banco = carregarBanco();
+    let mudou = false;
+    banco.forEach(e => {
+      if (e.gestoraId === undefined) {
+        if (e.cnpjPrincipal) {
+          const gestora = banco.find(m => m.cnpj && normalizarCNPJ(m.cnpj) === normalizarCNPJ(e.cnpjPrincipal));
+          e.gestoraId = gestora ? gestora.id : '';
+        } else {
+          e.gestoraId = '';
+        }
+        mudou = true;
+      }
+    });
+    if (mudou) localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+  } catch (err) {}
 }
 
 function cadastrarEmpresa() {
   const nomeEmpresa = document.getElementById('empresa').value.trim();
-  if (!nomeEmpresa) { mostrarToast('Preencha o nome da empresa.', true); return; }
+  if (!nomeEmpresa) { mostrarToast('Preencha o nome da edificação.', true); return; }
 
   const cnpjDigitado = document.getElementById('cnpj').value.trim();
   const cnpjNorm = normalizarCNPJ(cnpjDigitado);
@@ -222,7 +807,7 @@ function cadastrarEmpresa() {
     }
   }
 
-  const cnpjPrincipal = document.getElementById('cnpjPrincipal').value;
+  const gestoraId = document.getElementById('gestora').value;
 
   const empresa = {
     id: 'EMP-' + Date.now(),
@@ -232,7 +817,7 @@ function cadastrarEmpresa() {
     whatsapp: document.getElementById('whatsapp').value,
     email: document.getElementById('email').value,
     cnpj: cnpjDigitado,
-    cnpjPrincipal: cnpjPrincipal || '',
+    gestoraId: gestoraId || '',
     obs: document.getElementById('obs').value,
     documentos: [],
     extintores: []
@@ -240,7 +825,7 @@ function cadastrarEmpresa() {
 
   // Limpa campos
   ['empresa','responsavel','telefone','whatsapp','email','cnpj','obs'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('cnpjPrincipal').value = '';
+  document.getElementById('gestora').value = '';
 
   empresas.push(empresa);
   renderizarEmpresas();
@@ -328,6 +913,8 @@ function concluirEmpresa(idEmpresa) {
   // Remove do formulário de cadastro
   empresas = empresas.filter(e => e.id !== idEmpresa);
   renderizarEmpresas();
+  popularSelectMatriz();
+  atualizarContadorAlertas();
 }
 
 function renderizarEmpresas() {
@@ -347,7 +934,7 @@ function renderizarEmpresas() {
         <p><b>Observações:</b> ${empresa.obs}</p>
 
         <div class="secao">
-          <h2>Documentos da Empresa e Atestado de Brigada</h2>
+          <h2>Documentos da Edificação e Atestado de Brigada</h2>
           <div class="grid">
             <div><label>Número do Documento</label><input type="text" id="numeroDocumento-${empresa.id}"></div>
             <div>
@@ -443,7 +1030,7 @@ function renderizarEmpresas() {
     html += `</tbody></table>
           <div style="margin-top:25px;text-align:right;">
             <button class="btn-verde" onclick="concluirEmpresa('${empresa.id}')">
-              💾 SALVAR EMPRESA NO SISTEMA
+              💾 SALVAR EDIFICAÇÃO NO SISTEMA
             </button>
           </div>
         </div>
@@ -470,7 +1057,7 @@ function pesquisarEmpresas() {
   const div = document.getElementById('resultadosPesquisa');
 
   if (resultados.length === 0) {
-    div.innerHTML = `<div class="aviso-vazio">${banco.length === 0 ? '📂 Nenhuma empresa salva ainda.' : '🔎 Nenhuma empresa encontrada para "' + termo + '".'}</div>`;
+    div.innerHTML = `<div class="aviso-vazio">${banco.length === 0 ? '📂 Nenhuma edificação salva ainda.' : '🔎 Nenhuma edificação encontrada para "' + termo + '".'}</div>`;
     return;
   }
 
@@ -480,19 +1067,19 @@ function pesquisarEmpresas() {
     const vencidos = [...e.documentos.map(d => calcularStatus(d.validade)), ...e.extintores.flatMap(x => [calcularStatus(x.validadeRecarga), calcularStatus(x.validadeHidro)])].filter(s => s.classe === 'vencido').length;
     const alertaBadge = vencidos > 0 ? `<span style="color:#b30000;font-weight:bold;">⚠️ ${vencidos} vencido(s)</span>` : `<span style="color:#1a7a1a;">✅ Tudo em dia</span>`;
 
-    // Hierarquia
+    // Hierarquia (Edificação Gestora)
     let hierarquiaBadge = '';
-    if (e.cnpjPrincipal) {
+    if (e.gestoraId) {
       const banco2 = carregarBanco();
-      const matriz = banco2.find(m => normalizarCNPJ(m.cnpj) === normalizarCNPJ(e.cnpjPrincipal));
-      const nomeMatriz = matriz ? matriz.nome : e.cnpjPrincipal;
-      hierarquiaBadge = `<span style="background:#fff0b3;color:#7a5800;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏭 FILIAL de ${nomeMatriz}</span>`;
+      const gestora = banco2.find(m => m.id === e.gestoraId);
+      const nomeGestora = gestora ? gestora.nome : '(gestora removida)';
+      hierarquiaBadge = `<span style="background:#fff0b3;color:#7a5800;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏢 Gerida por ${nomeGestora}</span>`;
     } else {
-      // Verifica se tem filiais
+      // Verifica se é gestora de outras edificações
       const banco2 = carregarBanco();
-      const filiais = banco2.filter(f => normalizarCNPJ(f.cnpjPrincipal) === normalizarCNPJ(e.cnpj) && e.cnpj);
-      if (filiais.length > 0) {
-        hierarquiaBadge = `<span style="background:#e6f0ff;color:#003580;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏢 MATRIZ (${filiais.length} filial(is))</span>`;
+      const geridas = banco2.filter(f => f.gestoraId === e.id);
+      if (geridas.length > 0) {
+        hierarquiaBadge = `<span style="background:#e6f0ff;color:#003580;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold;">🏛️ EDIFICAÇÃO GESTORA (${geridas.length} vinculada(s))</span>`;
       }
     }
 
@@ -529,22 +1116,22 @@ function fecharDetalhe() {
 function renderizarDetalhe() {
   const e = empresaDetalhe;
 
-  // Hierarquia
+  // Hierarquia (Edificação Gestora)
   const banco = carregarBanco();
   let hierarquiaHtml = '';
-  if (e.cnpjPrincipal) {
-    const matriz = banco.find(m => normalizarCNPJ(m.cnpj) === normalizarCNPJ(e.cnpjPrincipal));
-    const nomeMatriz = matriz ? matriz.nome : e.cnpjPrincipal;
-    const linkMatriz = matriz ? `<span style="color:#0055aa;cursor:pointer;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${matriz.id}'),200)">🔗 Ver Matriz</span>` : '';
+  if (e.gestoraId) {
+    const gestora = banco.find(m => m.id === e.gestoraId);
+    const nomeGestora = gestora ? gestora.nome : '(gestora removida)';
+    const linkGestora = gestora ? `<span style="color:#0055aa;cursor:pointer;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${gestora.id}'),200)">🔗 Ver gestora</span>` : '';
     hierarquiaHtml = `<div style="background:#fff8e1;border-left:4px solid #f9a825;padding:10px 16px;border-radius:6px;margin-bottom:16px;">
-      🏭 <b>FILIAL</b> — pertence à Matriz: <b>${nomeMatriz}</b> (CNPJ: ${e.cnpjPrincipal}) ${linkMatriz}
+      🏢 <b>EDIFICAÇÃO GERIDA</b> — vinculada à gestora: <b>${nomeGestora}</b> ${linkGestora}
     </div>`;
-  } else if (e.cnpj) {
-    const filiais = banco.filter(f => normalizarCNPJ(f.cnpjPrincipal) === normalizarCNPJ(e.cnpj) && f.id !== e.id);
-    if (filiais.length > 0) {
-      const listaFiliais = filiais.map(f => `<li style="cursor:pointer;color:#0055aa;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${f.id}'),200)">${f.nome} — ${f.cnpj || 'CNPJ não informado'}</li>`).join('');
+  } else {
+    const geridas = banco.filter(f => f.gestoraId === e.id && f.id !== e.id);
+    if (geridas.length > 0) {
+      const listaGeridas = geridas.map(f => `<li style="cursor:pointer;color:#0055aa;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${f.id}'),200)">${f.nome}${f.cnpj ? ' — ' + f.cnpj : ''}</li>`).join('');
       hierarquiaHtml = `<div style="background:#e8f0fe;border-left:4px solid #1a73e8;padding:10px 16px;border-radius:6px;margin-bottom:16px;">
-        🏢 <b>MATRIZ</b> — ${filiais.length} filial(is) vinculada(s):<ul style="margin:6px 0 0 16px;padding:0;">${listaFiliais}</ul>
+        🏛️ <b>EDIFICAÇÃO GESTORA</b> — ${geridas.length} edificação(ões) vinculada(s):<ul style="margin:6px 0 0 16px;padding:0;">${listaGeridas}</ul>
       </div>`;
     }
   }
@@ -559,14 +1146,15 @@ function renderizarDetalhe() {
       <p><b>WhatsApp:</b> ${e.whatsapp}</p>
       <p><b>Email:</b> ${e.email}</p>
       <p><b>CNPJ:</b> ${e.cnpj}</p>
-      <p><b>CNPJ Principal (Matriz):</b> ${e.cnpjPrincipal || '—'}</p>
+      <p><b>Edificação Gestora:</b> ${nomeGestoraAtual(e)}</p>
       <p><b>Observações:</b> ${e.obs}</p>
     </div>
 
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-      <button class="btn-azul" onclick="editarDadosEmpresa()">✏️ EDITAR DADOS DA EMPRESA</button>
+      <button class="btn-azul" onclick="editarDadosEmpresa()">✏️ EDITAR DADOS DA EDIFICAÇÃO</button>
       <button class="btn-verde" onclick="salvarDetalheNoBanco()">💾 SALVAR ALTERAÇÕES</button>
-      <button style="background:#8b0000;margin-top:0;" onclick="excluirEmpresa('${e.id}')">🗑️ EXCLUIR EMPRESA</button>
+      <button onclick="gerarRelatorioPDF()">📄 GERAR RELATÓRIO (PDF)</button>
+      <button style="background:#8b0000;margin-top:0;" onclick="excluirEmpresa('${e.id}')">🗑️ EXCLUIR EDIFICAÇÃO</button>
     </div>
 
     <div class="secao">
@@ -731,14 +1319,26 @@ function excluirExtintorDetalhe(index) {
 
 function editarDadosEmpresa() {
   const e = empresaDetalhe;
-  const novoNome = prompt('Nome da empresa:', e.nome); if (novoNome !== null) e.nome = novoNome;
+  const novoNome = prompt('Nome da edificação:', e.nome); if (novoNome !== null) e.nome = novoNome;
   const novoResp = prompt('Responsável:', e.responsavel); if (novoResp !== null) e.responsavel = novoResp;
   const novoTel = prompt('Telefone:', e.telefone); if (novoTel !== null) e.telefone = novoTel;
   const novoWA = prompt('WhatsApp:', e.whatsapp); if (novoWA !== null) e.whatsapp = novoWA;
   const novoEmail = prompt('Email:', e.email); if (novoEmail !== null) e.email = novoEmail;
   const novoCNPJ = prompt('CNPJ:', e.cnpj); if (novoCNPJ !== null) e.cnpj = novoCNPJ;
-  const novoCNPJPrincipal = prompt('CNPJ Principal (Matriz) — deixe em branco para empresa independente:', e.cnpjPrincipal || '');
-  if (novoCNPJPrincipal !== null) e.cnpjPrincipal = novoCNPJPrincipal.trim();
+  // Edificação Gestora — seleção por lista numerada
+  const candidatas = carregarBanco().filter(b => !b.gestoraId && b.id !== e.id);
+  let msgG = 'Edificação Gestora — digite o número correspondente:\n0) Nenhuma (independente)\n';
+  candidatas.forEach((c, i) => { msgG += `${i + 1}) ${c.nome}${c.cnpj ? ' — ' + c.cnpj : ''}\n`; });
+  const atualIdx = candidatas.findIndex(c => c.id === e.gestoraId);
+  const escolhaG = prompt(msgG, atualIdx >= 0 ? String(atualIdx + 1) : '0');
+  if (escolhaG !== null) {
+    const n = parseInt(escolhaG);
+    if (!isNaN(n) && n >= 0 && n <= candidatas.length) {
+      e.gestoraId = n === 0 ? '' : candidatas[n - 1].id;
+    } else {
+      mostrarToast('Opção de gestora inválida — vínculo anterior mantido.', true);
+    }
+  }
   const novoObs = prompt('Observações:', e.obs); if (novoObs !== null) e.obs = novoObs;
   renderizarDetalhe();
 }
@@ -748,18 +1348,24 @@ function salvarDetalheNoBanco() {
   mostrarToast(`✅ "${empresaDetalhe.nome}" atualizada com sucesso!`);
   popularSelectMatriz();
   pesquisarEmpresas();
+  atualizarContadorAlertas();
+  renderizarAlertas();
 }
 
 function excluirEmpresa(id) {
-  if (!confirm('Tem certeza que deseja EXCLUIR esta empresa e todos os seus dados?')) return;
+  if (!confirm('Tem certeza que deseja EXCLUIR esta edificação e todos os seus dados?')) return;
   excluirDoBanco(id);
-  mostrarToast('Empresa excluída.');
+  mostrarToast('Edificação excluída.');
   popularSelectMatriz();
   fecharDetalhe();
   pesquisarEmpresas();
+  atualizarContadorAlertas();
 }
 
 // Inicialização
+inicializarSenha();
+migrarParaGestoraId();
+verificarAutenticacao();
 popularSelectMatriz();
 </script>
 </body>
