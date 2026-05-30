@@ -2,7 +2,30 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <script>
+    (function(){
+      var ua = navigator.userAgent;
+      var w = window.innerWidth || screen.width;
+      var tipo;
+      if (/Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || w <= 767) {
+        tipo = 'device-mobile';
+      } else if (/iPad|Tablet|PlayBook/i.test(ua) || (w >= 768 && w <= 1199)) {
+        tipo = 'device-tablet';
+      } else {
+        tipo = 'device-desktop';
+      }
+      document.documentElement.className = (document.documentElement.className + ' ' + tipo).trim();
+      window.addEventListener('resize', function(){
+        var nw = window.innerWidth;
+        var el = document.documentElement;
+        el.classList.remove('device-mobile','device-tablet','device-desktop');
+        if (nw <= 767) el.classList.add('device-mobile');
+        else if (nw <= 1199) el.classList.add('device-tablet');
+        else el.classList.add('device-desktop');
+      });
+    })();
+  </script>
   <title>COMBAT FIRE - Sistema de Conformidade</title>
   <style>
     body { margin:0; padding:0; font-family:Arial, sans-serif; background:#f4f4f4; }
@@ -53,6 +76,10 @@
     h2 { color:#b30000; margin-top:0; }
 
     .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px; }
+    .cnpj-destaque { background:#fff6f6; border:1px solid #f0caca; border-radius:10px; padding:16px; margin-bottom:6px; }
+    body.dark .cnpj-destaque { background:#2a1212; border-color:#5a0000; }
+    .campo-cnpj-help { color:#666; font-size:13px; margin:16px 0 6px; }
+    body.dark .campo-cnpj-help { color:#aaa; }
     label { font-weight:bold; display:block; margin-bottom:5px; color:#444; }
     input, select, textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box; }
     textarea { min-height:140px; resize:vertical; }
@@ -71,6 +98,7 @@
     .vencido { background:#ffcccc; font-weight:bold; }
     .breve { background:#fff0b3; font-weight:bold; }
     .valido { background:#ccffcc; font-weight:bold; }
+    .sem-data { background:#f0f0f0; color:#999; font-weight:normal; }
     .empresa-titulo { font-size:24px; color:#b30000; font-weight:bold; margin-bottom:15px; }
     .secao { margin-top:30px; }
 
@@ -184,12 +212,185 @@
     .btn-icone.excluir:hover { background:#ffecec; border-color:#b30000; color:#b30000; }
     .btn-icone.agenda:hover  { background:#e8f4ea; border-color:#1a7a1a; color:#1a7a1a; }
 
-    @media (max-width: 700px) {
-      .dash-grid { grid-template-columns: 1fr 1fr; }
-      #dashboardConteudo .dash-section { grid-column: 1 / -1; }
-      #dashboardConteudo > div:last-child { grid-template-columns: 1fr !important; }
+    /* ===== RODAPÉ / FOOTER ===== */
+    footer {
+      background:#1a0000;
+      color:#aaa;
+      text-align:center;
+      padding:18px 20px;
+      font-size:12px;
+      border-top:3px solid #b30000;
+      letter-spacing:0.4px;
+      margin-top:30px;
     }
+    footer .footer-copy { color:#ccc; font-weight:bold; font-size:13px; display:block; margin-bottom:4px; }
+    footer .footer-legal { font-size:11px; color:#888; }
+    body.dark footer { background:#0d0000; border-top-color:#6b0000; }
+
+    /* ===== RESPONSIVIDADE COMPLETA ===== */
+
+    /* --- DESKTOP grande (>1200px): layout máximo --- */
+    @media (min-width:1200px) {
+      .container { max-width:1300px; }
+    }
+
+    /* --- TABLET (768px – 1199px) --- */
+    @media (max-width:1199px) and (min-width:768px) {
+      .container { padding:16px; }
+      .grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+      .dash-grid { grid-template-columns: repeat(2, 1fr); }
+      .detalhe-box { margin:20px; padding:22px; }
+      header { font-size:22px; padding:16px; }
+      .header-actions button { font-size:12px; padding:7px 11px; }
+      .tab-btn { font-size:14px; padding:12px 8px; }
+      table { font-size:13px; }
+      th, td { padding:8px 6px; }
+    }
+
+    /* --- MOBILE e TABLET PEQUENO (<=767px) --- */
+    @media (max-width:767px) {
+      /* Header */
+      header {
+        flex-direction:column;
+        align-items:flex-start;
+        padding:12px 16px 10px;
+        font-size:17px;
+        gap:10px;
+        text-align:left;
+      }
+      .header-actions {
+        position:static;
+        display:flex !important;
+        flex-wrap:wrap;
+        gap:6px;
+        width:100%;
+      }
+      .header-actions button {
+        font-size:12px;
+        padding:7px 10px;
+        flex:1 1 auto;
+        min-width:110px;
+        text-align:center;
+      }
+
+      /* Abas: rolar horizontalmente no mobile */
+      .tabs {
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+      }
+      .tabs::-webkit-scrollbar { display:none; }
+      .tab-btn {
+        flex:0 0 auto;
+        font-size:13px;
+        padding:11px 14px;
+        white-space:nowrap;
+      }
+
+      /* Toolbar */
+      .toolbar {
+        flex-wrap:wrap;
+        padding:10px 12px;
+        gap:8px;
+      }
+      .toolbar .toolbar-label { width:100%; }
+      .toolbar button { flex:1 1 auto; font-size:13px; padding:8px 10px; }
+
+      /* Container */
+      .container { padding:12px; }
+      .card { padding:14px; border-radius:10px; }
+
+      /* Grid campos do formulário: 1 coluna */
+      .grid { grid-template-columns:1fr !important; }
+
+      /* Dashboard KPIs: 2 colunas no mobile */
+      .dash-grid { grid-template-columns:1fr 1fr; gap:10px; }
+      .kpi-card { padding:14px 12px; }
+      .kpi-card .kpi-valor { font-size:28px; }
+
+      /* Tabelas: scroll horizontal */
+      .card .table-wrap, table { display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      table { min-width:520px; }
+      th, td { padding:8px 6px; font-size:12px; }
+
+      /* Overlay detalhe */
+      .detalhe-box { margin:0; border-radius:0; padding:16px; min-height:100vh; }
+      .fechar-detalhe { position:fixed; top:10px; right:10px; z-index:1100; padding:7px 14px; font-size:13px; }
+
+      /* Modais */
+      .modal-box, #modalEdicaoBox, #adminBox { padding:20px 16px; border-radius:12px; }
+
+      /* Alertas */
+      .alerta-item { flex-direction:column; align-items:flex-start; gap:8px; }
+      .alerta-item .ai-acoes { width:100%; display:flex; gap:8px; }
+      .alerta-item .ai-acoes button { flex:1; }
+      .alerta-resumo { gap:8px; }
+      .alerta-filtros { flex-wrap:wrap; gap:8px; }
+      .alerta-filtros button { flex:1 1 auto; margin-top:0; font-size:13px; }
+
+      /* Search bar */
+      .search-bar { flex-direction:column; gap:8px; }
+      .search-bar button { width:100%; margin-top:0; }
+
+      /* Login */
+      .login-card { padding:26px 20px; }
+
+      /* H2 */
+      h2 { font-size:18px; }
+
+      /* Botões de ação nas linhas */
+      .btn-icone { padding:7px 9px; font-size:14px; }
+
+      /* dash-alerta-row */
+      .dash-alerta-row { flex-wrap:wrap; gap:6px; }
+      .dash-alerta-row .dar-desc { min-width:100%; }
+
+      /* Footer */
+      footer { margin-top:20px; padding:14px 16px; }
+    }
+
+    /* --- MOBILE MUITO PEQUENO (<=400px) --- */
+    @media (max-width:400px) {
+      header { font-size:15px; }
+      .tab-btn { font-size:12px; padding:10px 10px; }
+      .dash-grid { grid-template-columns:1fr 1fr; }
+      .kpi-card .kpi-valor { font-size:24px; }
+    }
+
     @media print { .no-print { display:none !important; } }
+
+    /* ===== PAINEL ADMIN / USUÁRIOS ===== */
+    #adminOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:6500; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; }
+    #adminOverlay.aberto { display:flex; }
+    #adminBox { background:white; border-radius:14px; padding:28px; width:100%; max-width:560px; box-shadow:0 12px 40px rgba(0,0,0,0.35); margin:auto; }
+    #adminBox h2 { margin-top:0; color:#b30000; }
+    .admin-tabs { display:flex; gap:0; margin-bottom:20px; border-bottom:2px solid #eee; }
+    .admin-tab { padding:10px 18px; background:transparent; border:none; cursor:pointer; font-size:14px; font-weight:bold; color:#888; border-bottom:3px solid transparent; margin-bottom:-2px; }
+    .admin-tab.ativo { color:#b30000; border-bottom-color:#b30000; }
+    .admin-secao { display:none; }
+    .admin-secao.ativa { display:block; }
+    .usuario-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; background:#f9f9f9; margin-bottom:8px; }
+    .usuario-item .ui-nome { flex:1; font-weight:bold; font-size:14px; }
+    .usuario-item .ui-tipo { font-size:12px; padding:2px 8px; border-radius:10px; font-weight:bold; }
+    .usuario-item .ui-tipo.admin { background:#ffe0e0; color:#b30000; }
+    .usuario-item .ui-tipo.user { background:#e0eeff; color:#0055aa; }
+    .usuario-item button { margin-top:0; padding:6px 10px; font-size:12px; }
+    .recuperar-link { background:none; border:none; color:#b30000; text-decoration:underline; cursor:pointer; font-size:13px; padding:0; margin-top:8px; display:inline-block; font-weight:bold; }
+    body.dark #adminBox { background:#2a2a2a; color:#e0e0e0; }
+    body.dark .admin-tab.ativo { color:#ff6666; border-bottom-color:#ff6666; }
+    body.dark .usuario-item { background:#333; }
+
+    /* ===== RECUPERAÇÃO DE SENHA (no login) ===== */
+    #recuperarOverlay { display:none; position:fixed; inset:0; background:linear-gradient(135deg,#8b0000,#b30000); z-index:5500; align-items:center; justify-content:center; padding:20px; }
+    #recuperarOverlay.aberto { display:flex; }
+    body.dark #recuperarOverlay .login-card { background:#2a2a2a; color:#e0e0e0; }
+    .codigo-admin-hint { font-size:12px; color:#888; margin-top:4px; }
+
+    /* ADEQUAÇÃO */
+    .adequacao-wrap { display:flex; align-items:center; gap:10px; background:#fff8e1; border:1.5px solid #f9a825; border-radius:8px; padding:10px 14px; margin-bottom:10px; }
+    .adequacao-wrap input[type=checkbox] { width:18px; height:18px; accent-color:#b30000; cursor:pointer; flex-shrink:0; }
+    .adequacao-wrap label { font-weight:bold; color:#7a5800; cursor:pointer; font-size:14px; margin:0; display:inline; }
+    .adequacao-wrap .adequacao-hint { font-size:12px; color:#a06a00; margin-left:4px; font-weight:normal; }
 
     /* MODAL EDIÇÃO DE DOCUMENTO / EXTINTOR */
     #modalEdicaoOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:7000; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; }
@@ -212,12 +413,116 @@
     <div class="logo">🔥</div>
     <h2>COMBAT FIRE</h2>
     <p class="sub">Sistema de Conformidade — Acesso Restrito</p>
-    <label>Senha de administrador</label>
+    <div id="loginUsuarioWrap" style="margin-bottom:6px;">
+      <label>Usuário</label>
+      <select id="loginUsuario" style="margin-bottom:6px;">
+        <option value="__admin__">Administrador</option>
+      </select>
+    </div>
+    <label>Senha</label>
     <input type="password" id="loginSenha" placeholder="Digite a senha" onkeydown="if(event.key==='Enter') fazerLogin()">
     <div class="login-erro" id="loginErro"></div>
     <button onclick="fazerLogin()">ENTRAR</button>
+    <div style="text-align:center;">
+      <button class="recuperar-link" onclick="abrirRecuperarSenha()">🔑 Esqueci minha senha</button>
+    </div>
     <div class="login-hint" id="loginHint" style="display:none;">
       🔑 Senha padrão inicial: <b>admin123</b><br>Entre e troque a senha em <b>"Alterar senha"</b>.
+    </div>
+  </div>
+</div>
+
+<!-- ===== RECUPERAÇÃO DE SENHA ===== -->
+<div id="recuperarOverlay">
+  <div class="login-card" style="max-width:400px;">
+    <div class="logo">🔑</div>
+    <h2 style="color:#b30000;">Recuperar Senha</h2>
+    <p class="sub" id="recuperarSubtitulo">Digite o código de administrador para redefinir a senha.</p>
+    <div id="recuperarPassoAdmin">
+      <label>Usuário a recuperar</label>
+      <select id="recuperarUsuarioSelect" style="margin-bottom:10px;">
+        <option value="__admin__">Administrador</option>
+      </select>
+      <label>Código de recuperação</label>
+      <input type="password" id="recuperarCodigo" placeholder="Código de recuperação" onkeydown="if(event.key==='Enter') validarCodigoRecuperacao()">
+      <div class="codigo-admin-hint">O código de recuperação é definido no Painel do Administrador.</div>
+      <div class="login-erro" id="recuperarErro"></div>
+      <button onclick="validarCodigoRecuperacao()" style="width:100%;margin-top:12px;">VERIFICAR CÓDIGO</button>
+    </div>
+    <div id="recuperarPassoNovaSenha" style="display:none;">
+      <label>Nova senha</label>
+      <input type="password" id="recuperarNovaSenha" placeholder="Nova senha (mín. 4 caracteres)">
+      <label style="margin-top:10px;">Confirmar nova senha</label>
+      <input type="password" id="recuperarConfirmaSenha" placeholder="Confirme a nova senha" onkeydown="if(event.key==='Enter') confirmarRecuperacao()">
+      <div class="login-erro" id="recuperarErro2"></div>
+      <button onclick="confirmarRecuperacao()" style="width:100%;margin-top:12px;">REDEFINIR SENHA</button>
+    </div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="recuperar-link" onclick="fecharRecuperarSenha()">← Voltar ao login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAINEL DO ADMINISTRADOR ===== -->
+<div id="adminOverlay">
+  <div id="adminBox">
+    <h2>⚙️ Painel do Administrador</h2>
+    <div class="admin-tabs">
+      <button class="admin-tab ativo" onclick="adminMudarAba('usuarios')">👥 Usuários</button>
+      <button class="admin-tab" onclick="adminMudarAba('codigo')">🔑 Código de Recuperação</button>
+      <button class="admin-tab" onclick="adminMudarAba('senhaadmin')">🔒 Senha do Admin</button>
+    </div>
+
+    <!-- ABA: USUÁRIOS -->
+    <div id="adminSecao-usuarios" class="admin-secao ativa">
+      <p style="color:#666;font-size:13px;margin-top:0;">Gerencie os usuários que podem fazer login no sistema.</p>
+      <div id="listaUsuariosAdmin"></div>
+      <hr style="margin:16px 0;">
+      <h3 style="margin:0 0 10px;font-size:15px;">➕ Adicionar novo usuário</h3>
+      <div class="modal-campo">
+        <label>Nome do usuário</label>
+        <input type="text" id="novoUsuarioNome" placeholder="Ex: João Silva">
+      </div>
+      <div class="modal-campo">
+        <label>Senha inicial</label>
+        <input type="password" id="novoUsuarioSenha" placeholder="Mínimo 4 caracteres">
+      </div>
+      <div class="login-erro" id="novoUsuarioErro"></div>
+      <button class="btn-verde" onclick="adicionarUsuario()" style="margin-top:6px;">✅ Adicionar usuário</button>
+    </div>
+
+    <!-- ABA: CÓDIGO DE RECUPERAÇÃO -->
+    <div id="adminSecao-codigo" class="admin-secao">
+      <p style="color:#666;font-size:13px;margin-top:0;">Este código permite que qualquer usuário (incluindo o admin) redefina sua senha na tela de login, sem precisar da senha antiga.</p>
+      <div class="modal-campo">
+        <label>Código de recuperação atual</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" id="codigoRecuperacaoInput" placeholder="Nenhum código definido" style="flex:1;">
+          <button type="button" class="btn-cinza" onclick="toggleVerCodigo()" style="margin-top:0;padding:10px 12px;">👁</button>
+        </div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">Guarde este código em local seguro. Sem ele, senhas esquecidas não podem ser recuperadas.</div>
+      </div>
+      <div id="codigoRecuperacaoErro" class="login-erro"></div>
+      <button class="btn-azul" onclick="salvarCodigoRecuperacao()" style="margin-top:6px;">💾 Salvar código</button>
+    </div>
+
+    <!-- ABA: SENHA DO ADMIN -->
+    <div id="adminSecao-senhaadmin" class="admin-secao">
+      <p style="color:#666;font-size:13px;margin-top:0;">Redefina a senha do administrador diretamente.</p>
+      <div class="modal-campo">
+        <label>Nova senha do administrador</label>
+        <input type="password" id="adminNovaSenha" placeholder="Nova senha (mín. 4 caracteres)">
+      </div>
+      <div class="modal-campo">
+        <label>Confirmar nova senha</label>
+        <input type="password" id="adminConfirmaSenha" placeholder="Repita a nova senha">
+      </div>
+      <div class="login-erro" id="adminSenhaErro"></div>
+      <button class="btn-verde" onclick="salvarSenhaAdmin()" style="margin-top:6px;">✅ Redefinir senha do admin</button>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+      <button class="btn-cinza" onclick="fecharPainelAdmin()" style="margin-top:0;">Fechar</button>
     </div>
   </div>
 </div>
@@ -226,6 +531,7 @@
   <span>COMBAT FIRE - SISTEMA DE CONFORMIDADE</span>
   <div class="header-actions" id="headerActions" style="display:none;">
     <button onclick="alternarTema()" id="btnTema" title="Alternar tema">🌙 Tema escuro</button>
+    <button onclick="abrirPainelAdmin()" id="btnAdmin" style="display:none;" title="Painel do Administrador">⚙️ Admin</button>
     <button onclick="abrirAlterarSenha()">🔒 Alterar senha</button>
     <button onclick="logout()">↩️ Sair</button>
   </div>
@@ -257,13 +563,31 @@
   <div class="container">
     <div class="card">
       <h2>Cadastrar Edificação</h2>
+
+      <!-- CNPJ em destaque, no topo: digite e o sistema busca os dados -->
+      <div class="cnpj-destaque">
+        <label style="font-size:15px;">CNPJ <span style="font-weight:normal;color:#888;">— digite o CNPJ e o sistema busca os dados na Receita Federal</span></label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <input type="text" id="cnpj" placeholder="00.000.000/0000-00" oninput="mascaraCNPJ(this)" onblur="buscarDadosCNPJ()" maxlength="18" style="flex:1;font-size:17px;padding:12px;">
+          <button type="button" class="btn-azul" style="margin-top:0;white-space:nowrap;" onclick="buscarDadosCNPJ({contexto:'cadastro',forcar:true})" title="Buscar dados do CNPJ na Receita Federal">🔍 Buscar dados</button>
+        </div>
+        <small id="cnpjStatus" style="display:block;margin-top:6px;font-size:13px;"></small>
+      </div>
+
+      <p class="campo-cnpj-help">Os campos abaixo são preenchidos automaticamente pela consulta e podem ser editados livremente:</p>
+
       <div class="grid">
-        <div><label>Edificação</label><input type="text" id="empresa"></div>
-        <div><label>Responsável</label><input type="text" id="responsavel"></div>
+        <div><label>Nome Empresarial <span style="font-weight:normal;color:#888;">— razão social</span></label><input type="text" id="razaoSocial"></div>
+        <div><label>Nome Fantasia / Edificação <span style="color:#b30000;">*</span></label><input type="text" id="empresa"></div>
+        <div><label>Atividade Econômica</label><input type="text" id="atividade" placeholder="CNAE principal"></div>
+        <div><label>Endereço</label><input type="text" id="endereco" placeholder="Logradouro, nº, complemento"></div>
+        <div><label>Bairro</label><input type="text" id="bairro"></div>
+        <div><label>CEP</label><input type="text" id="cep" placeholder="00000-000"></div>
+        <div><label>Município / UF</label><input type="text" id="municipio" placeholder="Cidade/UF"></div>
         <div><label>Telefone</label><input type="text" id="telefone"></div>
         <div><label>WhatsApp</label><input type="text" id="whatsapp"></div>
         <div><label>Email</label><input type="email" id="email"></div>
-        <div><label>CNPJ</label><input type="text" id="cnpj" placeholder="00.000.000/0000-00" oninput="mascaraCNPJ(this)" maxlength="18"></div>
+        <div><label>Responsável</label><input type="text" id="responsavel"></div>
         <div>
           <label>Edificação Gestora <span style="font-weight:normal;color:#888;">— opcional</span></label>
           <select id="gestora">
@@ -346,15 +670,319 @@
   </div>
 </div>
 
+<!-- ===== RODAPÉ ===== -->
+<footer class="no-print" id="siteFooter" style="display:none;">
+  <span class="footer-copy">© 2026 Combat Fire Sistemas. Todos os direitos reservados.</span>
+  <span class="footer-legal">É proibida a reprodução, cópia ou modificação deste sistema sem autorização expressa e por escrito da Combat Fire Sistemas.</span>
+</footer>
+
 <div id="toast"></div>
 
 <script>
+// ============ CONFIGURAÇÃO GOOGLE SHEETS ============
+// Cole aqui a URL do seu Web App publicado no Google Apps Script:
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbzEL4qZFkFzoTdVWVAhHv8bsaJIAkO8LJOOCeOBzjpl1h5tHPUxjL0BMwE0dtl2OK0vEw/exec';
+
+/*
+ ═══════════════════════════════════════════════════════════════
+  INSTRUÇÕES — GOOGLE APPS SCRIPT  (versão estruturada — 3 abas)
+  ───────────────────────────────────────────────────────────────
+  1. Abra seu Google Sheets
+  2. Menu: Extensões → Apps Script
+  3. Apague TUDO que estiver lá e cole o código abaixo
+  4. Clique em "Implantar" → "Nova implantação"
+     Tipo: App da Web | Executar como: Eu | Quem tem acesso: Qualquer pessoa
+  5. Autorize as permissões solicitadas
+  6. Copie a URL gerada e cole acima em SHEETS_API_URL
+  7. A planilha terá 3 abas criadas automaticamente:
+       • edificacoes  — dados gerais de cada edificação
+       • documentos   — todos os documentos (uma linha por documento)
+       • extintores   — todos os extintores  (uma linha por extintor)
+
+  ── CÓDIGO PARA O APPS SCRIPT ──────────────────────────────────
+
+// ============================================================
+//  COMBAT FIRE — Apps Script (estruturado, 3 abas)
+// ============================================================
+
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+
+// Converte qualquer valor de célula de data para "YYYY-MM-DD"
+function fmtDate(v) {
+  if (!v || v === '') return '';
+  if (v instanceof Date) {
+    // Objeto Date do Sheets — formata com fuso correto
+    return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  }
+  const s = String(v).trim();
+  if (!s) return '';
+  // Aceita "2026-01-01", "2026-01-01T..." ou qualquer ISO
+  return s.substring(0, 10);
+}
+
+// Garante que uma aba exista e retorna o objeto Sheet
+function getSheet(name, headers) {
+  let s = SS.getSheetByName(name);
+  if (!s) {
+    s = SS.insertSheet(name);
+    s.appendRow(headers);
+    s.setFrozenRows(1);
+    s.getRange(1, 1, 1, headers.length)
+      .setBackground('#b30000')
+      .setFontColor('#ffffff')
+      .setFontWeight('bold');
+  }
+  return s;
+}
+
+// Headers de cada aba
+const H_EDIF = [
+  'id','nome','responsavel','telefone','whatsapp','email',
+  'cnpj','gestoraId','obs','numeroProcesso','processoGestor','atualizado_em','dados_json_backup'
+];
+const H_DOCS = [
+  'edificacao_id','edificacao_nome','doc_index',
+  'tipo','numeroDocumento','numeroProcesso','processoGestor',
+  'emissao','validade','tipoValidade','quantidade','emAdequacao','atualizado_em'
+];
+const H_EXT = [
+  'edificacao_id','edificacao_nome','ext_index',
+  'numero','agente','capacidade','validadeRecarga','validadeHidro','atualizado_em'
+];
+
+// ── doGet: devolve todas as edificações com documentos e extintores embutidos
+function doGet(e) {
+  const sEdif = SS.getSheetByName('edificacoes');
+  if (!sEdif || sEdif.getLastRow() <= 1) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const rowsEdif = sEdif.getRange(2, 1, sEdif.getLastRow() - 1, H_EDIF.length).getValues();
+  const sDocs = SS.getSheetByName('documentos');
+  const sExt  = SS.getSheetByName('extintores');
+
+  // Monta mapa de documentos por edificacao_id
+  const docsMap = {};
+  if (sDocs && sDocs.getLastRow() > 1) {
+    sDocs.getRange(2, 1, sDocs.getLastRow() - 1, H_DOCS.length).getValues().forEach(r => {
+      const eid = String(r[0]);
+      if (!docsMap[eid]) docsMap[eid] = [];
+      docsMap[eid].push({
+        tipo: r[3], numeroDocumento: r[4], numeroProcesso: r[5],
+        processoGestor: r[6],
+        emissao:  fmtDate(r[7]),
+        validade: fmtDate(r[8]),
+        tipoValidade: r[9], quantidade: r[10],
+        emAdequacao: r[11] === true || r[11] === 'true' || r[11] === 'sim'
+      });
+    });
+  }
+
+  // Mapa de extintores
+  const extMap = {};
+  if (sExt && sExt.getLastRow() > 1) {
+    sExt.getRange(2, 1, sExt.getLastRow() - 1, H_EXT.length).getValues().forEach(r => {
+      const eid = String(r[0]);
+      if (!extMap[eid]) extMap[eid] = [];
+      extMap[eid].push({
+        numero: r[3], agente: r[4], capacidade: r[5],
+        validadeRecarga: fmtDate(r[6]),
+        validadeHidro:   fmtDate(r[7])
+      });
+    });
+  }
+
+  const resultado = rowsEdif.map(r => {
+    // Campos extras (nome empresarial, fantasia, atividade, endereço...) ficam
+    // guardados no backup JSON (última coluna) — recupera sem mudar o schema.
+    let extra = {};
+    try { extra = JSON.parse(r[12] || '{}') || {}; } catch (err) { extra = {}; }
+    return {
+      id:              r[0],
+      nome:            r[1],
+      responsavel:     r[2],
+      telefone:        r[3],
+      whatsapp:        r[4],
+      email:           r[5],
+      cnpj:            r[6],
+      gestoraId:       r[7],
+      obs:             r[8],
+      numeroProcesso:  r[9],
+      processoGestor:  r[10],
+      razaoSocial:     extra.razaoSocial || '',
+      atividade:       extra.atividade   || '',
+      endereco:        extra.endereco    || '',
+      bairro:          extra.bairro      || '',
+      cep:             extra.cep         || '',
+      municipio:       extra.municipio   || '',
+      documentos:      docsMap[String(r[0])] || [],
+      extintores:      extMap[String(r[0])]  || []
+    };
+  }).filter(e => e.id);
+
+  return ContentService.createTextOutput(JSON.stringify(resultado))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── doPost: salvar ou excluir
+function doPost(e) {
+  const payload = JSON.parse(e.postData.contents);
+
+  if (payload.acao === 'salvar') {
+    upsertEdificacao(payload.dados);
+  } else if (payload.acao === 'excluir') {
+    excluirEdificacao(payload.id);
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── Upsert completo: edificação + documentos + extintores
+function upsertEdificacao(d) {
+  const agora = new Date().toISOString();
+  const sEdif = getSheet('edificacoes', H_EDIF);
+  const sDocs = getSheet('documentos',  H_DOCS);
+  const sExt  = getSheet('extintores',  H_EXT);
+
+  // 1. Atualiza ou insere linha na aba edificacoes
+  const edifData = sEdif.getDataRange().getValues();
+  const rowEdif = [
+    d.id, d.nome||'', d.responsavel||'', d.telefone||'', d.whatsapp||'',
+    d.email||'', d.cnpj||'', d.gestoraId||'', d.obs||'',
+    d.numeroProcesso||'', d.processoGestor||'',
+    agora, JSON.stringify(d)   // backup JSON completo na última coluna
+  ];
+  let found = false;
+  for (let i = 1; i < edifData.length; i++) {
+    if (edifData[i][0] === d.id) {
+      sEdif.getRange(i + 1, 1, 1, H_EDIF.length).setValues([rowEdif]);
+      found = true; break;
+    }
+  }
+  if (!found) sEdif.appendRow(rowEdif);
+
+  // 2. Remove documentos antigos desta edificação e reinsere
+  removerLinhasPorId(sDocs, d.id, 0);
+  (d.documentos || []).forEach((doc, idx) => {
+    const lastDocRow = sDocs.getLastRow();
+    sDocs.appendRow([
+      d.id, d.nome||'', idx,
+      doc.tipo||'', doc.numeroDocumento||'', doc.numeroProcesso||'',
+      doc.processoGestor||'', String(doc.emissao||''), String(doc.validade||''),
+      doc.tipoValidade||'', doc.quantidade||'',
+      doc.emAdequacao ? 'sim' : 'não', agora
+    ]);
+    // Força colunas de data (emissao=col8, validade=col9) como texto puro
+    sDocs.getRange(lastDocRow + 1, 8, 1, 2).setNumberFormat('@STRING@');
+  });
+
+  // 3. Remove extintores antigos e reinsere
+  removerLinhasPorId(sExt, d.id, 0);
+  (d.extintores || []).forEach((ext, idx) => {
+    const lastExtRow = sExt.getLastRow();
+    sExt.appendRow([
+      d.id, d.nome||'', idx,
+      ext.numero||'', ext.agente||'', ext.capacidade||'',
+      String(ext.validadeRecarga||''), String(ext.validadeHidro||''), agora
+    ]);
+    // Força colunas de data (validadeRecarga=col7, validadeHidro=col8) como texto puro
+    sExt.getRange(lastExtRow + 1, 7, 1, 2).setNumberFormat('@STRING@');
+  });
+}
+
+// Remove todas as linhas de uma aba onde coluna[colIdx] === id
+function removerLinhasPorId(sheet, id, colIdx) {
+  if (sheet.getLastRow() <= 1) return;
+  const vals = sheet.getRange(2, colIdx + 1, sheet.getLastRow() - 1, 1).getValues();
+  for (let i = vals.length - 1; i >= 0; i--) {
+    if (vals[i][0] === id) sheet.deleteRow(i + 2);
+  }
+}
+
+// ── Excluir edificação e todos os seus documentos/extintores
+function excluirEdificacao(id) {
+  const sEdif = SS.getSheetByName('edificacoes');
+  const sDocs = SS.getSheetByName('documentos');
+  const sExt  = SS.getSheetByName('extintores');
+  if (sEdif) removerLinhasPorId(sEdif, id, 0);
+  if (sDocs) removerLinhasPorId(sDocs, id, 0);
+  if (sExt)  removerLinhasPorId(sExt,  id, 0);
+}
+
+ ═══════════════════════════════════════════════════════════════
+*/
+
+// Cache local para evitar múltiplas requisições desnecessárias
+let _bancoCache = null;
+
+// Indicador de carregamento
+function mostrarCarregando(msg = 'Aguarde...') {
+  let el = document.getElementById('loadingOverlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loadingOverlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;display:flex;align-items:center;justify-content:center;';
+    el.innerHTML = `<div style="background:white;padding:28px 36px;border-radius:14px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.3);">
+      <div style="font-size:36px;margin-bottom:10px;">🔥</div>
+      <div id="loadingMsg" style="font-weight:bold;font-size:16px;color:#b30000;">${msg}</div>
+      <div style="margin-top:10px;color:#888;font-size:13px;">Conectando ao Google Sheets...</div>
+    </div>`;
+    document.body.appendChild(el);
+  } else {
+    document.getElementById('loadingMsg').textContent = msg;
+    el.style.display = 'flex';
+  }
+}
+
+function ocultarCarregando() {
+  const el = document.getElementById('loadingOverlay');
+  if (el) el.style.display = 'none';
+}
+
 // ============ UTILIDADES ============
 
 let empresas = []; // em edição no formulário
 let empresaSendoEditada = null; // ID da empresa aberta no overlay de edição
 
 // ============ MÁSCARA CNPJ ============
+
+// ============ ADEQUAÇÃO (em processo — campos não obrigatórios) ============
+
+function toggleAdequacaoCadastro(idEmpresa) {
+  const chk = document.getElementById(`adequacao-${idEmpresa}`);
+  const emAdequacao = chk && chk.checked;
+  // Asteriscos de obrigatoriedade
+  const estrelaDoc  = document.getElementById(`estrelaDoc-${idEmpresa}`);
+  const estrelaProc = document.getElementById(`estrelaProc-${idEmpresa}`);
+  const estrelaGes  = document.getElementById(`estrelaGes-${idEmpresa}`);
+  if (estrelaDoc) estrelaDoc.style.display  = emAdequacao ? 'none' : '';
+  if (estrelaProc) estrelaProc.style.display = emAdequacao ? 'none' : '';
+  if (estrelaGes)  estrelaGes.style.display  = emAdequacao ? 'none' : '';
+}
+
+function toggleAdequacaoDet() {
+  const chk = document.getElementById('det-adequacao');
+  const emAdequacao = chk && chk.checked;
+  const estrelaDoc  = document.getElementById('det-estrelaDoc');
+  const estrelaProc = document.getElementById('det-estrelaProc');
+  const estrelaGes  = document.getElementById('det-estrelaGes');
+  if (estrelaDoc) estrelaDoc.style.display  = emAdequacao ? 'none' : '';
+  if (estrelaProc) estrelaProc.style.display = emAdequacao ? 'none' : '';
+  if (estrelaGes)  estrelaGes.style.display  = emAdequacao ? 'none' : '';
+}
+
+function toggleAdequacaoModal() {
+  const chk = document.getElementById('me-adequacao');
+  const emAdequacao = chk && chk.checked;
+  const estrelaDoc  = document.getElementById('me-estrelaDoc');
+  const estrelaProc = document.getElementById('me-estrelaProc');
+  const estrelaGes  = document.getElementById('me-estrelaGes');
+  if (estrelaDoc) estrelaDoc.style.display  = emAdequacao ? 'none' : '';
+  if (estrelaProc) estrelaProc.style.display = emAdequacao ? 'none' : '';
+  if (estrelaGes)  estrelaGes.style.display  = emAdequacao ? 'none' : '';
+}
 
 function mascaraCNPJ(input) {
   let v = input.value.replace(/\D/g, '').substring(0, 14);
@@ -363,9 +991,120 @@ function mascaraCNPJ(input) {
   else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
   else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
   input.value = v;
+  // Dispara a busca automática assim que o CNPJ fica completo (14 dígitos),
+  // direcionando para o contexto correto (cadastro ou modal de edição).
+  if (input.value.replace(/\D/g, '').length === 14) {
+    buscarDadosCNPJ({ contexto: input.id === 'me-cnpj' ? 'edicao' : 'cadastro' });
+  }
 }
 
-// ============ LOGIN ADMINISTRATIVO ============
+// Formata telefone do tipo "1122334455" / "11912345678"
+function formatarTelefoneBR(tel) {
+  const d = String(tel || '').replace(/\D/g, '');
+  if (d.length === 11) return d.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  if (d.length === 10) return d.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+  return tel || '';
+}
+function formatarCEP(cep) {
+  const d = String(cep || '').replace(/\D/g, '');
+  return d.length === 8 ? d.replace(/^(\d{5})(\d{3})$/, '$1-$2') : (cep || '');
+}
+
+// ============ BUSCA AUTOMÁTICA DE DADOS DO CNPJ (Receita Federal via BrasilAPI) ============
+// Funciona tanto no cadastro quanto no modal de edição. O contexto define quais
+// campos serão preenchidos.
+const MAPA_CNPJ = {
+  cadastro: {
+    cnpjId: 'cnpj', statusId: 'cnpjStatus',
+    campos: { razaoSocial:'razaoSocial', fantasia:'empresa', atividade:'atividade',
+              endereco:'endereco', bairro:'bairro', cep:'cep', municipio:'municipio',
+              telefone:'telefone', email:'email' }
+  },
+  edicao: {
+    cnpjId: 'me-cnpj', statusId: 'me-cnpjStatus',
+    campos: { razaoSocial:'me-razao', fantasia:'me-nome', atividade:'me-atividade',
+              endereco:'me-endereco', bairro:'me-bairro', cep:'me-cep', municipio:'me-municipio',
+              telefone:'me-tel', email:'me-email' }
+  }
+};
+let _ultimoCNPJbuscado = '';
+async function buscarDadosCNPJ(opts) {
+  opts = opts || {};
+  const cfg = MAPA_CNPJ[opts.contexto === 'edicao' ? 'edicao' : 'cadastro'];
+  const forcar = !!opts.forcar; // clique no botão = força nova busca e sobrescreve
+  const campo = document.getElementById(cfg.cnpjId);
+  if (!campo) return;
+  const cnpj = (campo.value || '').replace(/\D/g, '');
+  const status = document.getElementById(cfg.statusId);
+
+  if (cnpj.length !== 14) {
+    if (status) status.textContent = '';
+    return;
+  }
+  // Evita buscar o mesmo CNPJ repetidamente ao digitar (botão sempre força)
+  if (!forcar && cnpj === _ultimoCNPJbuscado) return;
+  _ultimoCNPJbuscado = cnpj;
+
+  if (status) { status.textContent = '🔄 Buscando dados na Receita Federal...'; status.style.color = '#888'; }
+
+  try {
+    const resp = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+    if (!resp.ok) throw new Error('nao_encontrado');
+    const d = await resp.json();
+    const m = cfg.campos;
+
+    // No clique do botão (forcar) sobrescreve; ao digitar, preenche só o que está vazio
+    const setar = (id, valor) => {
+      const el = document.getElementById(id);
+      if (!el || !valor) return;
+      if (forcar || !el.value.trim()) el.value = valor;
+    };
+
+    const razao = d.razao_social || d.nome || '';
+    const fantasia = (d.nome_fantasia && String(d.nome_fantasia).trim()) ? d.nome_fantasia : razao;
+    setar(m.razaoSocial, razao);
+    setar(m.fantasia, fantasia);
+
+    let atividade = d.cnae_fiscal_descricao || '';
+    if (!atividade && Array.isArray(d.atividade_principal) && d.atividade_principal[0]) {
+      atividade = d.atividade_principal[0].text || d.atividade_principal[0].descricao || '';
+    }
+    if (atividade && d.cnae_fiscal) atividade = d.cnae_fiscal + ' - ' + atividade;
+    setar(m.atividade, atividade);
+
+    const endereco = [
+      d.logradouro || '',
+      d.numero ? 'nº ' + d.numero : '',
+      d.complemento || ''
+    ].filter(Boolean).join(', ');
+    setar(m.endereco, endereco);
+    setar(m.bairro, d.bairro || '');
+    setar(m.cep, formatarCEP(d.cep));
+    const municipio = d.municipio || d.municipio_nome || '';
+    setar(m.municipio, municipio ? municipio + (d.uf ? '/' + d.uf : '') : '');
+
+    const telefone = d.ddd_telefone_1 || d.telefone || d.ddd_telefone_2 || '';
+    setar(m.telefone, formatarTelefoneBR(telefone));
+    const email = (d.email || d.correio_eletronico || '').toLowerCase();
+    setar(m.email, email);
+
+    const situacao = d.descricao_situacao_cadastral || d.situacao || '';
+    if (status) {
+      const inativa = situacao && situacao.toUpperCase() !== 'ATIVA';
+      status.textContent = '✅ Dados encontrados' + (situacao ? ' — situação cadastral: ' + situacao : '');
+      status.style.color = inativa ? '#b30000' : '#1a7a1a';
+    }
+    mostrarToast('✅ Dados do CNPJ preenchidos. Confira antes de salvar.');
+  } catch (err) {
+    _ultimoCNPJbuscado = ''; // permite tentar de novo
+    if (status) {
+      status.textContent = '⚠️ Não foi possível buscar este CNPJ (não encontrado na base pública ou sem internet). Preencha manualmente.';
+      status.style.color = '#b30000';
+    }
+  }
+}
+
+// ============ LOGIN / USUÁRIOS / RECUPERAÇÃO DE SENHA ============
 // Observação: por ser um sistema 100% local (no navegador), este login é uma
 // barreira de acesso para o uso diário — não é uma proteção criptográfica forte.
 
@@ -381,26 +1120,69 @@ function hashSenha(s) {
   return (h >>> 0).toString(16);
 }
 
+// ── Usuários armazenados ──────────────────────────────────────────────────────
+// Estrutura: { __admin__: {hash, tipo:'admin'}, 'id_user': {nome, hash, tipo:'user'} }
+function carregarUsuarios() {
+  try {
+    const raw = localStorage.getItem('combatfire_usuarios');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {};
+}
+
+function salvarUsuarios(usuarios) {
+  try { localStorage.setItem('combatfire_usuarios', JSON.stringify(usuarios)); } catch(e) {}
+}
+
 function inicializarSenha() {
   try {
-    if (!localStorage.getItem('combatfire_admin_hash')) {
-      localStorage.setItem('combatfire_admin_hash', hashSenha(SENHA_PADRAO));
+    // Migra hash antigo para nova estrutura
+    const usuarios = carregarUsuarios();
+    if (!usuarios.__admin__) {
+      const hashAntigo = localStorage.getItem('combatfire_admin_hash') || hashSenha(SENHA_PADRAO);
+      usuarios.__admin__ = { nome: 'Administrador', hash: hashAntigo, tipo: 'admin' };
+      salvarUsuarios(usuarios);
     }
   } catch (e) {}
 }
 
-function senhaArmazenada() {
-  try { return localStorage.getItem('combatfire_admin_hash') || hashSenha(SENHA_PADRAO); }
-  catch (e) { return hashSenha(SENHA_PADRAO); }
+function senhaArmazenada(userId) {
+  userId = userId || '__admin__';
+  try {
+    const usuarios = carregarUsuarios();
+    if (usuarios[userId]) return usuarios[userId].hash;
+    if (userId === '__admin__') return localStorage.getItem('combatfire_admin_hash') || hashSenha(SENHA_PADRAO);
+  } catch(e) {}
+  return hashSenha(SENHA_PADRAO);
 }
 
 function estaUsandoSenhaPadrao() {
-  return senhaArmazenada() === hashSenha(SENHA_PADRAO);
+  return senhaArmazenada('__admin__') === hashSenha(SENHA_PADRAO);
+}
+
+// ── Preenchimento do select de usuários no login ─────────────────────────────
+function popularSelectLogin() {
+  const sel = document.getElementById('loginUsuario');
+  if (!sel) return;
+  const usuarios = carregarUsuarios();
+  // Limpa e repõe
+  sel.innerHTML = '<option value="__admin__">Administrador</option>';
+  Object.entries(usuarios).forEach(([id, u]) => {
+    if (id === '__admin__') return;
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = u.nome;
+    sel.appendChild(opt);
+  });
+  // Mostra o wrap só se houver mais de um usuário
+  const wrap = document.getElementById('loginUsuarioWrap');
+  if (wrap) wrap.style.display = Object.keys(usuarios).length > 1 ? 'block' : 'none';
 }
 
 function verificarAutenticacao() {
   let autenticado = false;
   try { autenticado = sessionStorage.getItem('combatfire_auth') === 'ok'; } catch (e) {}
+  popularSelectLogin();
   if (autenticado) {
     revelarApp();
   } else {
@@ -411,9 +1193,27 @@ function verificarAutenticacao() {
   }
 }
 
-function revelarApp() {
+async function revelarApp() {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('headerActions').style.display = 'flex';
+  const footer = document.getElementById('siteFooter');
+  if (footer) footer.style.display = 'block';
+  // Mostra botão Admin só para admin
+  try {
+    const userId = sessionStorage.getItem('combatfire_userid') || '__admin__';
+    const btnAdmin = document.getElementById('btnAdmin');
+    if (btnAdmin) btnAdmin.style.display = userId === '__admin__' ? 'inline-block' : 'none';
+  } catch(e) {}
+  popularSelectMatriz();
+  atualizarContadorAlertas();
+  renderizarDashboard();
+  mostrarCarregando('Carregando dados do Google Sheets...');
+  try {
+    await carregarBancoAsync();
+  } catch(e) {
+    mostrarToast('⚠️ Não foi possível carregar dados do Google Sheets. Verifique a conexão.', true);
+  }
+  ocultarCarregando();
   popularSelectMatriz();
   atualizarContadorAlertas();
   renderizarDashboard();
@@ -421,22 +1221,30 @@ function revelarApp() {
 
 function fazerLogin() {
   const senha = document.getElementById('loginSenha').value;
+  const userId = (document.getElementById('loginUsuario') && document.getElementById('loginUsuario').value) || '__admin__';
   const erro = document.getElementById('loginErro');
 
-  // Aceita se o hash bate OU se a senha digitada é admin123 (reset de emergência)
-  const hashOk = hashSenha(senha) === senhaArmazenada();
-  const adminOk = senha === 'admin123';
+  const hashOk = hashSenha(senha) === senhaArmazenada(userId);
+  // Fallback de emergência somente para admin
+  const adminOk = userId === '__admin__' && senha === 'admin123';
 
   if (hashOk || adminOk) {
-    // Se entrou com admin123 por fallback, regrava o hash correto
     if (adminOk && !hashOk) {
-      try { localStorage.setItem('combatfire_admin_hash', hashSenha('admin123')); } catch(e) {}
+      try {
+        const usuarios = carregarUsuarios();
+        if (!usuarios.__admin__) usuarios.__admin__ = { nome: 'Administrador', hash: hashSenha('admin123'), tipo: 'admin' };
+        else usuarios.__admin__.hash = hashSenha('admin123');
+        salvarUsuarios(usuarios);
+      } catch(e) {}
     }
-    try { sessionStorage.setItem('combatfire_auth', 'ok'); } catch (e) {}
+    try {
+      sessionStorage.setItem('combatfire_auth', 'ok');
+      sessionStorage.setItem('combatfire_userid', userId);
+    } catch (e) {}
     document.getElementById('loginSenha').value = '';
     erro.textContent = '';
-    revelarApp();
     mostrarToast('✅ Acesso liberado.');
+    revelarApp();
   } else {
     erro.textContent = '❌ Senha incorreta.';
     document.getElementById('loginSenha').value = '';
@@ -445,11 +1253,15 @@ function fazerLogin() {
 }
 
 function logout() {
-  try { sessionStorage.removeItem('combatfire_auth'); } catch (e) {}
+  try {
+    sessionStorage.removeItem('combatfire_auth');
+    sessionStorage.removeItem('combatfire_userid');
+  } catch (e) {}
   fecharDetalhe();
   verificarAutenticacao();
 }
 
+// ── Alterar senha (usuário logado) ────────────────────────────────────────────
 function abrirAlterarSenha() {
   document.getElementById('senhaAtual').value = '';
   document.getElementById('senhaNova').value = '';
@@ -463,17 +1275,23 @@ function fecharAlterarSenha() {
 }
 
 function salvarNovaSenha() {
+  const userId = (function(){ try { return sessionStorage.getItem('combatfire_userid') || '__admin__'; } catch(e){ return '__admin__'; } })();
   const atual = document.getElementById('senhaAtual').value;
   const nova = document.getElementById('senhaNova').value;
   const confirma = document.getElementById('senhaConfirma').value;
   const erro = document.getElementById('senhaErro');
 
-  if (hashSenha(atual) !== senhaArmazenada()) { erro.textContent = '❌ Senha atual incorreta.'; return; }
+  if (hashSenha(atual) !== senhaArmazenada(userId)) { erro.textContent = '❌ Senha atual incorreta.'; return; }
   if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
   if (nova !== confirma) { erro.textContent = '❌ A confirmação não coincide com a nova senha.'; return; }
 
   try {
-    localStorage.setItem('combatfire_admin_hash', hashSenha(nova));
+    const usuarios = carregarUsuarios();
+    if (!usuarios[userId]) usuarios[userId] = { nome: userId === '__admin__' ? 'Administrador' : userId, tipo: userId === '__admin__' ? 'admin' : 'user' };
+    usuarios[userId].hash = hashSenha(nova);
+    salvarUsuarios(usuarios);
+    // compatibilidade com chave legada
+    if (userId === '__admin__') localStorage.setItem('combatfire_admin_hash', hashSenha(nova));
     fecharAlterarSenha();
     mostrarToast('✅ Senha alterada com sucesso!');
   } catch (e) {
@@ -481,10 +1299,241 @@ function salvarNovaSenha() {
   }
 }
 
+// ── Recuperação de senha (na tela de login) ───────────────────────────────────
+function abrirRecuperarSenha() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  // Preenche select de usuários
+  const sel = document.getElementById('recuperarUsuarioSelect');
+  if (sel) {
+    const usuarios = carregarUsuarios();
+    sel.innerHTML = '<option value="__admin__">Administrador</option>';
+    Object.entries(usuarios).forEach(([id, u]) => {
+      if (id === '__admin__') return;
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = u.nome;
+      sel.appendChild(opt);
+    });
+  }
+  document.getElementById('recuperarCodigo').value = '';
+  document.getElementById('recuperarErro').textContent = '';
+  document.getElementById('recuperarNovaSenha').value = '';
+  document.getElementById('recuperarConfirmaSenha').value = '';
+  document.getElementById('recuperarErro2').textContent = '';
+  document.getElementById('recuperarPassoAdmin').style.display = 'block';
+  document.getElementById('recuperarPassoNovaSenha').style.display = 'none';
+  document.getElementById('recuperarOverlay').classList.add('aberto');
+  document.getElementById('recuperarOverlay').style.display = 'flex';
+  setTimeout(() => { const c = document.getElementById('recuperarCodigo'); if (c) c.focus(); }, 100);
+}
+
+function fecharRecuperarSenha() {
+  document.getElementById('recuperarOverlay').classList.remove('aberto');
+  document.getElementById('recuperarOverlay').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+}
+
+function obterCodigoRecuperacao() {
+  try { return localStorage.getItem('combatfire_recovery_hash') || ''; } catch(e) { return ''; }
+}
+
+function validarCodigoRecuperacao() {
+  const codigo = document.getElementById('recuperarCodigo').value;
+  const erro = document.getElementById('recuperarErro');
+  const codigoHash = obterCodigoRecuperacao();
+
+  if (!codigoHash) {
+    erro.textContent = '❌ Nenhum código de recuperação foi definido pelo administrador. Entre em contato com o administrador do sistema.';
+    return;
+  }
+  if (hashSenha(codigo) !== codigoHash) {
+    erro.textContent = '❌ Código de recuperação inválido.';
+    return;
+  }
+  erro.textContent = '';
+  document.getElementById('recuperarPassoAdmin').style.display = 'none';
+  document.getElementById('recuperarPassoNovaSenha').style.display = 'block';
+  setTimeout(() => { document.getElementById('recuperarNovaSenha').focus(); }, 100);
+}
+
+function confirmarRecuperacao() {
+  const userId = document.getElementById('recuperarUsuarioSelect').value || '__admin__';
+  const nova = document.getElementById('recuperarNovaSenha').value;
+  const confirma = document.getElementById('recuperarConfirmaSenha').value;
+  const erro = document.getElementById('recuperarErro2');
+
+  if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
+  if (nova !== confirma) { erro.textContent = '❌ As senhas não coincidem.'; return; }
+
+  try {
+    const usuarios = carregarUsuarios();
+    if (!usuarios[userId]) usuarios[userId] = { nome: userId === '__admin__' ? 'Administrador' : userId, tipo: userId === '__admin__' ? 'admin' : 'user' };
+    usuarios[userId].hash = hashSenha(nova);
+    salvarUsuarios(usuarios);
+    if (userId === '__admin__') localStorage.setItem('combatfire_admin_hash', hashSenha(nova));
+    fecharRecuperarSenha();
+    mostrarToast('✅ Senha redefinida com sucesso! Faça login com a nova senha.');
+  } catch(e) {
+    erro.textContent = '❌ Erro ao salvar a nova senha.';
+  }
+}
+
+// ── Painel do Administrador ───────────────────────────────────────────────────
+function abrirPainelAdmin() {
+  renderizarListaUsuarios();
+  // Carrega código de recuperação mascarado
+  const codigoHash = obterCodigoRecuperacao();
+  document.getElementById('codigoRecuperacaoInput').value = codigoHash ? '••••••••' : '';
+  document.getElementById('codigoRecuperacaoInput').dataset.preenchido = codigoHash ? '1' : '0';
+  document.getElementById('codigoRecuperacaoErro').textContent = '';
+  document.getElementById('adminNovaSenha').value = '';
+  document.getElementById('adminConfirmaSenha').value = '';
+  document.getElementById('adminSenhaErro').textContent = '';
+  document.getElementById('novoUsuarioNome').value = '';
+  document.getElementById('novoUsuarioSenha').value = '';
+  document.getElementById('novoUsuarioErro').textContent = '';
+  adminMudarAba('usuarios');
+  document.getElementById('adminOverlay').classList.add('aberto');
+}
+
+function fecharPainelAdmin() {
+  document.getElementById('adminOverlay').classList.remove('aberto');
+}
+
+function adminMudarAba(aba) {
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('ativo'));
+  document.querySelectorAll('.admin-secao').forEach(s => s.classList.remove('ativa'));
+  event.currentTarget.classList.add('ativo');
+  const sec = document.getElementById('adminSecao-' + aba);
+  if (sec) sec.classList.add('ativa');
+}
+
+function renderizarListaUsuarios() {
+  const cont = document.getElementById('listaUsuariosAdmin');
+  if (!cont) return;
+  const usuarios = carregarUsuarios();
+  cont.innerHTML = '';
+  // Admin sempre primeiro
+  const adminItem = document.createElement('div');
+  adminItem.className = 'usuario-item';
+  adminItem.innerHTML = `<span class="ui-nome">👑 Administrador</span><span class="ui-tipo admin">ADMIN</span>`;
+  cont.appendChild(adminItem);
+  Object.entries(usuarios).forEach(([id, u]) => {
+    if (id === '__admin__') return;
+    const div = document.createElement('div');
+    div.className = 'usuario-item';
+    div.innerHTML = `
+      <span class="ui-nome">👤 ${u.nome || id}</span>
+      <span class="ui-tipo user">USUÁRIO</span>
+      <button class="btn-cinza" onclick="redefinirSenhaUsuario('${id}')" style="font-size:12px;padding:5px 10px;">🔄 Redefinir senha</button>
+      <button style="background:#b30000;font-size:12px;padding:5px 10px;" onclick="removerUsuario('${id}')">🗑 Remover</button>
+    `;
+    cont.appendChild(div);
+  });
+  if (Object.keys(usuarios).filter(k => k !== '__admin__').length === 0) {
+    const vazio = document.createElement('p');
+    vazio.style.cssText = 'color:#999;font-size:13px;';
+    vazio.textContent = 'Nenhum usuário adicional cadastrado.';
+    cont.appendChild(vazio);
+  }
+}
+
+function adicionarUsuario() {
+  const nome = document.getElementById('novoUsuarioNome').value.trim();
+  const senha = document.getElementById('novoUsuarioSenha').value;
+  const erro = document.getElementById('novoUsuarioErro');
+
+  if (!nome) { erro.textContent = '❌ Informe o nome do usuário.'; return; }
+  if (senha.length < 4) { erro.textContent = '❌ A senha deve ter pelo menos 4 caracteres.'; return; }
+
+  const usuarios = carregarUsuarios();
+  const id = 'user_' + Date.now();
+  usuarios[id] = { nome, hash: hashSenha(senha), tipo: 'user' };
+  salvarUsuarios(usuarios);
+  document.getElementById('novoUsuarioNome').value = '';
+  document.getElementById('novoUsuarioSenha').value = '';
+  erro.textContent = '';
+  renderizarListaUsuarios();
+  popularSelectLogin();
+  mostrarToast(`✅ Usuário "${nome}" adicionado com sucesso!`);
+}
+
+function removerUsuario(id) {
+  const usuarios = carregarUsuarios();
+  const nome = usuarios[id] ? usuarios[id].nome : id;
+  if (!confirm(`Remover o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return;
+  delete usuarios[id];
+  salvarUsuarios(usuarios);
+  renderizarListaUsuarios();
+  popularSelectLogin();
+  mostrarToast(`Usuário "${nome}" removido.`);
+}
+
+function redefinirSenhaUsuario(id) {
+  const usuarios = carregarUsuarios();
+  const nome = usuarios[id] ? usuarios[id].nome : id;
+  const novaSenha = prompt(`Nova senha para "${nome}" (mín. 4 caracteres):`);
+  if (novaSenha === null) return;
+  if (!novaSenha || novaSenha.length < 4) { mostrarToast('❌ Senha muito curta. Mínimo 4 caracteres.', true); return; }
+  usuarios[id].hash = hashSenha(novaSenha);
+  salvarUsuarios(usuarios);
+  mostrarToast(`✅ Senha de "${nome}" redefinida com sucesso!`);
+}
+
+function salvarCodigoRecuperacao() {
+  const input = document.getElementById('codigoRecuperacaoInput');
+  const erro = document.getElementById('codigoRecuperacaoErro');
+  const valor = input.value;
+  // Se ainda está o placeholder de pontos (não foi editado), não altera
+  if (valor === '••••••••' && input.dataset.preenchido === '1') {
+    erro.textContent = '⚠️ Para alterar o código, apague o conteúdo do campo e digite o novo código.';
+    return;
+  }
+  if (!valor) { erro.textContent = '❌ Digite um código de recuperação.'; return; }
+  if (valor.length < 4) { erro.textContent = '❌ O código deve ter pelo menos 4 caracteres.'; return; }
+  try {
+    localStorage.setItem('combatfire_recovery_hash', hashSenha(valor));
+    input.value = '••••••••';
+    input.dataset.preenchido = '1';
+    erro.textContent = '';
+    mostrarToast('✅ Código de recuperação salvo com sucesso!');
+  } catch(e) {
+    erro.textContent = '❌ Não foi possível salvar o código.';
+  }
+}
+
+function toggleVerCodigo() {
+  const input = document.getElementById('codigoRecuperacaoInput');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function salvarSenhaAdmin() {
+  const nova = document.getElementById('adminNovaSenha').value;
+  const confirma = document.getElementById('adminConfirmaSenha').value;
+  const erro = document.getElementById('adminSenhaErro');
+  if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
+  if (nova !== confirma) { erro.textContent = '❌ As senhas não coincidem.'; return; }
+  try {
+    const usuarios = carregarUsuarios();
+    if (!usuarios.__admin__) usuarios.__admin__ = { nome: 'Administrador', tipo: 'admin' };
+    usuarios.__admin__.hash = hashSenha(nova);
+    salvarUsuarios(usuarios);
+    localStorage.setItem('combatfire_admin_hash', hashSenha(nova));
+    document.getElementById('adminNovaSenha').value = '';
+    document.getElementById('adminConfirmaSenha').value = '';
+    erro.textContent = '';
+    mostrarToast('✅ Senha do administrador redefinida com sucesso!');
+  } catch(e) {
+    erro.textContent = '❌ Erro ao salvar a senha.';
+  }
+}
+
 // ============ EXPORTAR / IMPORTAR BACKUP ============
 
-function exportarBackup() {
-  const banco = carregarBanco();
+async function exportarBackup() {
+  mostrarCarregando('Exportando backup...');
+  const banco = await carregarBancoAsync();
+  ocultarCarregando();
   const payload = {
     sistema: 'COMBAT FIRE - Sistema de Conformidade',
     versao: 1,
@@ -509,7 +1558,7 @@ function importarBackup(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function (ev) {
+  reader.onload = async function (ev) {
     let dados;
     try { dados = JSON.parse(ev.target.result); }
     catch (e) { mostrarToast('❌ Arquivo inválido (não é um JSON válido).', true); event.target.value = ''; return; }
@@ -526,26 +1575,33 @@ function importarBackup(event) {
       `Cancelar = MESCLAR (manter os atuais e adicionar/atualizar os do backup).`
     );
 
-    let banco;
+    let bancoParcial;
     if (substituir) {
-      banco = validas;
+      bancoParcial = validas;
     } else {
-      banco = carregarBanco();
+      bancoParcial = await carregarBancoAsync();
       validas.forEach(nova => {
-        const idx = banco.findIndex(e => e.id === nova.id);
-        if (idx >= 0) banco[idx] = nova; else banco.push(nova);
+        const idx = bancoParcial.findIndex(e => e.id === nova.id);
+        if (idx >= 0) bancoParcial[idx] = nova; else bancoParcial.push(nova);
       });
     }
 
     try {
-      localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
-      migrarParaGestoraId();
+      mostrarCarregando(`Importando ${bancoParcial.length} edificação(ões)...`);
+      for (const e of bancoParcial) {
+        await salvarNoBanco(e);
+      }
+      _bancoCache = null;
+      await carregarBancoAsync();
+      await migrarParaGestoraId();
+      ocultarCarregando();
       mostrarToast(`⬆️ Backup importado: ${validas.length} edificação(ões) (${substituir ? 'substituição' : 'mesclagem'}).`);
       popularSelectMatriz();
       pesquisarEmpresas();
       atualizarContadorAlertas();
       renderizarAlertas();
     } catch (e) {
+      ocultarCarregando();
       mostrarToast('❌ Não foi possível salvar os dados importados.', true);
     }
     event.target.value = '';
@@ -565,6 +1621,7 @@ function formatarDataBR(iso) {
 function corStatus(classe) {
   if (classe === 'vencido') return { bg: '#ffcccc', txt: '#b30000' };
   if (classe === 'breve')   return { bg: '#fff0b3', txt: '#7a5800' };
+  if (classe === 'sem-data') return { bg: '#f0f0f0', txt: '#999999' };
   return { bg: '#ccffcc', txt: '#1a7a1a' };
 }
 
@@ -572,17 +1629,63 @@ function gerarRelatorioPDF() {
   const e = empresaDetalhe;
   if (!e) return;
 
+  const banco = carregarBanco();
+
+  // ── Edificações vinculadas (quando esta é gestora) ──────────────────────────
+  const geridas = banco.filter(f => f.gestoraId === e.id && f.id !== e.id);
+  let geridasHtml = '';
+  if (geridas.length > 0) {
+    geridasHtml = geridas.map((f, i) => {
+      const ultimoDoc = (f.documentos || []).slice().sort((a, b) => (b.validade || '') > (a.validade || '') ? 1 : -1)[0];
+      const statusEdif = ultimoDoc ? calcularStatus(ultimoDoc.validade) : null;
+      const corEdif = statusEdif ? corStatus(statusEdif.classe) : { bg: '#f0f0f0', txt: '#999' };
+      const statusTxt = statusEdif ? statusEdif.texto : 'Sem doc.';
+      return `<tr>
+        <td style="text-align:left;font-weight:bold;">${f.nome}</td>
+        <td>${f.cnpj || '—'}</td>
+        <td>${f.responsavel || '—'}</td>
+        <td>${f.numeroProcesso || '—'}</td>
+        <td style="background:${corEdif.bg};color:${corEdif.txt};font-weight:bold;">${statusTxt}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Edificação gestora desta (quando esta é gerida) ─────────────────────────
+  let gestoraBanner = '';
+  if (e.gestoraId) {
+    const gestora = banco.find(m => m.id === e.gestoraId);
+    const nomeG = gestora ? gestora.nome : '(gestora removida)';
+    const procG = gestora ? (gestora.numeroProcesso || '—') : '—';
+    gestoraBanner = `<div style="background:#fff8e1;border-left:5px solid #f9a825;padding:10px 16px;border-radius:6px;margin-bottom:18px;font-size:13px;">
+      🏢 <b>EDIFICAÇÃO GERIDA</b> — Gestora: <b>${nomeG}</b> &nbsp;|&nbsp; Nº Processo Gestora: <b>${procG}</b>
+    </div>`;
+  } else if (geridas.length > 0) {
+    gestoraBanner = `<div style="background:#e8f0fe;border-left:5px solid #1a73e8;padding:10px 16px;border-radius:6px;margin-bottom:18px;font-size:13px;">
+      🏛️ <b>EDIFICAÇÃO GESTORA</b> — responsável por <b>${geridas.length}</b> edificação(ões) vinculada(s)
+    </div>`;
+  }
+
+  // ── Documentos ──────────────────────────────────────────────────────────────
   let docsHtml = '';
   if (e.documentos.length === 0) {
-    docsHtml = `<tr><td colspan="6" class="vazio">Nenhum documento cadastrado.</td></tr>`;
+    docsHtml = `<tr><td colspan="7" class="vazio">Nenhum documento cadastrado.</td></tr>`;
   } else {
     e.documentos.forEach(doc => {
       const s = calcularStatus(doc.validade);
       const c = corStatus(s.classe);
+      const numProc = doc.tipo === 'Certificado de Conformidade' ? (doc.numeroProcesso || e.numeroProcesso || '—') : '—';
+      // Processo Gestor: mostra "nº — nome da gestora" se disponível
+      let procGestorTxt = '—';
+      if (doc.tipo === 'Certificado de Conformidade' && doc.processoGestor) {
+        const gestora = e.gestoraId ? banco.find(m => m.id === e.gestoraId) : null;
+        const nomeG = gestora ? gestora.nome : '';
+        procGestorTxt = nomeG ? `${doc.processoGestor} — ${nomeG}` : doc.processoGestor;
+      }
       docsHtml += `<tr>
         <td>${doc.tipo || '—'}</td>
         <td>${doc.numeroDocumento || '—'}</td>
-        <td style="white-space:pre-line;text-align:left;">${doc.participantes || '—'}</td>
+        <td>${numProc}</td>
+        <td>${procGestorTxt}</td>
         <td>${formatarDataBR(doc.emissao)}</td>
         <td>${formatarDataBR(doc.validade)}</td>
         <td style="background:${c.bg};color:${c.txt};font-weight:bold;">${s.texto}</td>
@@ -622,6 +1725,13 @@ function gerarRelatorioPDF() {
     ? `⚠️ ${totalVencidos} item(ns) VENCIDO(S) — requer atenção`
     : '✅ Nenhum item vencido';
 
+  // Seção edificações vinculadas (só para gestora)
+  const secaoVinculadas = geridas.length > 0 ? `
+    <h2>🏛️ Edificações Vinculadas (${geridas.length})</h2>
+    <table><thead><tr>
+      <th>Edificação</th><th>CNPJ</th><th>Responsável</th><th>Nº Processo</th><th>Status Último Doc.</th>
+    </tr></thead><tbody>${geridasHtml}</tbody></table>` : '';
+
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Relatório - ${e.nome}</title>
     <style>
@@ -652,6 +1762,7 @@ function gerarRelatorioPDF() {
       <div class="sub">Emitido em ${dataGeracao}</div>
     </div>
     <h1>${e.nome}</h1>
+    ${gestoraBanner}
     <div class="dados">
       <p><b>CNPJ:</b> ${e.cnpj || '—'}</p>
       <p><b>Responsável:</b> ${e.responsavel || '—'}</p>
@@ -662,9 +1773,10 @@ function gerarRelatorioPDF() {
       <p style="grid-column:1 / -1;"><b>Observações:</b> ${e.obs || '—'}</p>
     </div>
     <div class="resumo">${resumoTxt}</div>
+    ${secaoVinculadas}
     <h2>Documentos e Atestados</h2>
     <table><thead><tr>
-      <th>Tipo</th><th>Nº Doc</th><th>Participantes</th><th>Emissão</th><th>Validade</th><th>Status</th>
+      <th>Tipo</th><th>Nº Doc</th><th>Nº Processo</th><th>Nº Processo Gestor</th><th>Emissão</th><th>Validade</th><th>Status</th>
     </tr></thead><tbody>${docsHtml}</tbody></table>
     <h2>Extintores</h2>
     <table><thead><tr>
@@ -690,6 +1802,34 @@ function mostrarToast(msg, erro = false) {
   t.className = erro ? 'erro' : '';
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
+}
+
+// ============ TOGGLE CAMPOS DE PROCESSO ============
+
+function toggleCamposProcesso(idEmpresa) {
+  const tipo = document.getElementById(`tipoDoc-${idEmpresa}`).value;
+  const isCert = tipo === 'Certificado de Conformidade';
+  const campoProcEl = document.getElementById(`campoNumeroProcesso-${idEmpresa}`);
+  const campoGestEl = document.getElementById(`campoProcessoGestor-${idEmpresa}`);
+  if (campoProcEl) campoProcEl.style.display = isCert ? '' : 'none';
+  if (campoGestEl) campoGestEl.style.display = isCert ? '' : 'none';
+}
+
+function toggleCamposProcessoDet() {
+  const tipo = document.getElementById('det-tipoDoc').value;
+  const isCert = tipo === 'Certificado de Conformidade';
+  const campoProcEl = document.getElementById('det-campoNumeroProcesso');
+  const campoGestEl = document.getElementById('det-campoProcessoGestor');
+  if (campoProcEl) campoProcEl.style.display = isCert ? '' : 'none';
+  if (campoGestEl) campoGestEl.style.display = isCert ? '' : 'none';
+}
+
+function toggleCamposProcessoModal(tipo, temGestora) {
+  const isCert = tipo === 'Certificado de Conformidade';
+  const campoProcEl = document.getElementById('me-campoNumeroProcesso');
+  const campoGestEl = document.getElementById('me-campoProcessoGestor');
+  if (campoProcEl) campoProcEl.style.display = isCert ? '' : 'none';
+  if (campoGestEl) campoGestEl.style.display = isCert ? '' : 'none';
 }
 
 function mudarAba(aba) {
@@ -732,25 +1872,26 @@ function renderizarDashboard() {
       totalDocs++;
       const s = calcularStatus(doc.validade);
       const tipo = doc.tipo || 'Documento';
-      contarCategoria(porTipoDoc, tipo, s.classe);
-      if (s.classe === 'vencido') vencidos++;
-      else if (s.classe === 'breve') aVencer++;
-      else validos++;
+      if (s.classe === 'vencido') { vencidos++; contarCategoria(porTipoDoc, tipo, 'vencido'); }
+      else if (s.classe === 'breve') { aVencer++; contarCategoria(porTipoDoc, tipo, 'breve'); }
+      else if (s.classe === 'valido') { validos++; contarCategoria(porTipoDoc, tipo, 'valido'); }
+      // sem-data: não conta em nenhum total de status
     });
     (e.extintores || []).forEach(ext => {
       totalExt++;
       const sR = calcularStatus(ext.validadeRecarga);
       const sH = calcularStatus(ext.validadeHidro);
-      if (sR.classe === 'vencido') { vencidos++; extRecarga.vencido++; }
-      else if (sR.classe === 'breve') { aVencer++; extRecarga.aVencer++; }
-      else { validos++; extRecarga.valido++; }
-      if (sH.classe === 'vencido') { vencidos++; extHidro.vencido++; }
-      else if (sH.classe === 'breve') { aVencer++; extHidro.aVencer++; }
-      else { validos++; extHidro.valido++; }
+      if (sR.classe === 'vencido')      { vencidos++; extRecarga.vencido++; }
+      else if (sR.classe === 'breve')   { aVencer++;  extRecarga.aVencer++; }
+      else if (sR.classe === 'valido')  { validos++;  extRecarga.valido++;  }
+      if (sH.classe === 'vencido')      { vencidos++; extHidro.vencido++; }
+      else if (sH.classe === 'breve')   { aVencer++;  extHidro.aVencer++; }
+      else if (sH.classe === 'valido')  { validos++;  extHidro.valido++;  }
     });
   });
 
-  const totalItens = totalDocs + (totalExt * 2);
+  // totalItens só conta os que têm data (com-data = vencido + breve + valido)
+  const totalItens = vencidos + aVencer + validos;
   const pctConformidade = totalItens > 0 ? Math.round((validos / totalItens) * 100) : 100;
   const corBarra = pctConformidade >= 80 ? '#1a7a1a' : pctConformidade >= 50 ? '#f0a500' : '#b30000';
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
@@ -764,7 +1905,7 @@ function renderizarDashboard() {
       <div onclick="${onclick}" style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.09);cursor:pointer;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.16)'" onmouseout="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.09)'">
         <div style="background:${bgTopo};padding:10px 14px;display:flex;align-items:center;gap:8px;">
           <span style="font-size:20px;">${emoji}</span>
-          <span style="color:white;font-weight:bold;font-size:13px;line-height:1.2;">${titulo}</span>
+          <span style="color:white;font-weight:bold;font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${titulo}</span>
         </div>
         <div style="padding:12px 14px;display:flex;gap:10px;justify-content:space-between;">
           <div style="text-align:center;flex:1;">
@@ -880,7 +2021,7 @@ function renderizarDashboard() {
     ${(Object.keys(porTipoDoc).length > 0 || totalExt > 0) ? `
     <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:20px;">
       <div style="font-size:13px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">📊 Status por tipo de item</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
         ${cardsDocHtml}
         ${cardsExtHtml}
       </div>
@@ -925,7 +2066,9 @@ function coletarAlertas(diasBreve) {
 
   function avaliar(dataValidade) {
     if (!dataValidade) return null; // sem data não gera alerta
-    const v = new Date(dataValidade); v.setHours(0, 0, 0, 0);
+    const str = String(dataValidade).substring(0, 10);
+    const v = new Date(str + 'T12:00:00'); v.setHours(0, 0, 0, 0);
+    if (isNaN(v.getTime())) return null;
     const dias = Math.ceil((v - hoje) / (1000 * 60 * 60 * 24));
     if (dias < 0) return { classe: 'vencido', dias };
     if (dias <= diasBreve) return { classe: 'breve', dias };
@@ -1102,33 +2245,85 @@ function atualizarContadorAlertas() {
   }
 }
 
-// ============ LOCALSTORAGE ============
+// ============ GOOGLE SHEETS — BANCO DE DADOS ============
 
-function salvarNoBanco(empresa) {
-  const banco = carregarBanco();
-  const idx = banco.findIndex(e => e.id === empresa.id);
-  if (idx >= 0) banco[idx] = empresa;
-  else banco.push(empresa);
-  localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
-}
-
-function carregarBanco() {
+// Lê todas as edificações (com cache de sessão)
+async function carregarBancoAsync() {
+  if (_bancoCache !== null) return _bancoCache;
+  if (!SHEETS_API_URL || SHEETS_API_URL.includes('COLE_AQUI')) {
+    console.warn('URL do Google Sheets não configurada.');
+    _bancoCache = [];
+    return _bancoCache;
+  }
   try {
-    return JSON.parse(localStorage.getItem('combatfire_empresas') || '[]');
-  } catch { return []; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const res = await fetch(SHEETS_API_URL, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error('Erro HTTP ' + res.status);
+    const dados = await res.json();
+    _bancoCache = Array.isArray(dados) ? dados : [];
+    return _bancoCache;
+  } catch (err) {
+    console.error('Erro ao carregar do Google Sheets:', err);
+    if (_bancoCache === null) _bancoCache = [];
+    return _bancoCache;
+  }
 }
 
-function excluirDoBanco(id) {
-  const banco = carregarBanco().filter(e => e.id !== id);
-  localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+// Síncrono: usa cache se disponível, senão retorna [] (compatibilidade com código legado)
+function carregarBanco() {
+  return _bancoCache !== null ? _bancoCache : [];
+}
+
+// Salva ou atualiza uma edificação
+async function salvarNoBanco(empresa) {
+  _bancoCache = null; // invalida cache
+  try {
+    const res = await fetch(SHEETS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Google Apps Script exige text/plain para CORS simples
+      body: JSON.stringify({ acao: 'salvar', dados: empresa })
+    });
+    if (!res.ok) throw new Error('Erro HTTP ' + res.status);
+    await carregarBancoAsync(); // recarrega cache
+    return true;
+  } catch (err) {
+    console.error('Erro ao salvar no Google Sheets:', err);
+    mostrarToast('❌ Erro ao salvar no Google Sheets.', true);
+    return false;
+  }
+}
+
+// Exclui uma edificação por ID
+async function excluirDoBanco(id) {
+  _bancoCache = null; // invalida cache
+  try {
+    const res = await fetch(SHEETS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ acao: 'excluir', id })
+    });
+    if (!res.ok) throw new Error('Erro HTTP ' + res.status);
+    await carregarBancoAsync(); // recarrega cache
+    return true;
+  } catch (err) {
+    console.error('Erro ao excluir no Google Sheets:', err);
+    mostrarToast('❌ Erro ao excluir no Google Sheets.', true);
+    return false;
+  }
 }
 
 // ============ STATUS ============
 
 function calcularStatus(dataValidade) {
-  if (!dataValidade) return { texto: 'SEM DATA', classe: 'breve' };
+  if (!dataValidade || String(dataValidade).trim() === '') return { texto: 'SEM DATA', classe: 'sem-data' };
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const validade = new Date(dataValidade); validade.setHours(0,0,0,0);
+  // Adiciona T12:00:00 para evitar que o parse UTC-3 jogue a data para o dia anterior
+  const str = String(dataValidade).substring(0, 10);
+  const validade = new Date(str + 'T12:00:00');
+  if (isNaN(validade.getTime())) return { texto: 'SEM DATA', classe: 'sem-data' };
+  validade.setHours(0,0,0,0);
   const diferenca = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
   if (diferenca < 0) return { texto: 'VENCIDO', classe: 'vencido' };
   if (diferenca <= 30) return { texto: 'VENCE EM BREVE', classe: 'breve' };
@@ -1163,10 +2358,77 @@ function nomeGestoraAtual(e) {
   return g ? g.nome : '(gestora removida)';
 }
 
+// ── Exibe info da gestora abaixo do select de Processo Gestor ────────────────
+// Mostra: "🏛️ Gestora: <Nome> | Nº Processo: <número>"
+function _montarInfoGestora(valorSelecionado) {
+  if (!valorSelecionado) return null;
+  const banco = carregarBanco();
+  // Encontra a gestora cujo numeroProcesso bate com o valor
+  const gestora = banco.find(g => !g.gestoraId && g.numeroProcesso === valorSelecionado);
+  if (!gestora) {
+    return `🏛️ Processo: <b>${valorSelecionado}</b>`;
+  }
+  return `🏛️ Gestora: <b>${gestora.nome}</b> &nbsp;|&nbsp; Nº Processo: <b>${valorSelecionado}</b>`;
+}
+
+function atualizarInfoGestoraDet() {
+  const sel = document.getElementById('det-processoGestor');
+  const div = document.getElementById('det-infoGestora');
+  if (!sel || !div) return;
+  const info = _montarInfoGestora(sel.value);
+  if (info) { div.innerHTML = info; div.style.display = 'block'; }
+  else { div.style.display = 'none'; }
+}
+
+function atualizarInfoGestoraModal() {
+  const sel = document.getElementById('me-processoGestor');
+  const div = document.getElementById('me-infoGestora');
+  if (!sel || !div) return;
+  const info = _montarInfoGestora(sel.value);
+  if (info) { div.innerHTML = info; div.style.display = 'block'; }
+  else { div.style.display = 'none'; }
+}
+
+function atualizarInfoGestoraLista(idEmpresa) {
+  const sel = document.getElementById(`processoGestor-${idEmpresa}`);
+  const div = document.getElementById(`infoGestora-${idEmpresa}`);
+  if (!sel || !div) return;
+  const info = _montarInfoGestora(sel.value);
+  if (info) { div.innerHTML = info; div.style.display = 'block'; }
+  else { div.style.display = 'none'; }
+}
+// Em vez de digitar, o usuário escolhe a edificação gestora numa lista que
+// mostra o nº do processo da gestora e o nome ao lado. O valor gravado em
+// processoGestor é o nº do processo da edificação gestora selecionada.
+function opcoesProcessoGestor(empresa, valorSalvo) {
+  const banco = carregarBanco();
+  // Edificações gestoras = edificações de topo (não geridas por outra)
+  const gestoras = banco.filter(g => !g.gestoraId);
+  const esc = s => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  // Pré-seleção: o valor já salvo OU o nº de processo da gestora vinculada
+  let preSel = valorSalvo || '';
+  if (!preSel && empresa && empresa.gestoraId) {
+    const vinc = banco.find(g => g.id === empresa.gestoraId);
+    if (vinc && vinc.numeroProcesso) preSel = vinc.numeroProcesso;
+  }
+
+  let html = '<option value="">— Selecione a edificação gestora —</option>';
+  gestoras.forEach(g => {
+    const num = g.numeroProcesso ? String(g.numeroProcesso) : '';
+    const rotulo = num ? esc(num) : '(sem nº de processo)';
+    const sel = (num && num === preSel) ? ' selected' : '';
+    html += `<option value="${esc(num)}"${sel}>${rotulo} — ${esc(g.nome)}</option>`;
+  });
+  return html;
+}
+
 // Converte vínculos antigos (cnpjPrincipal por CNPJ) para gestoraId (por edificação)
-function migrarParaGestoraId() {
+async function migrarParaGestoraId() {
   try {
-    const banco = carregarBanco();
+    const banco = await carregarBancoAsync();
     let mudou = false;
     banco.forEach(e => {
       if (e.gestoraId === undefined) {
@@ -1179,7 +2441,11 @@ function migrarParaGestoraId() {
         mudou = true;
       }
     });
-    if (mudou) localStorage.setItem('combatfire_empresas', JSON.stringify(banco));
+    if (mudou) {
+      for (const e of banco) {
+        await salvarNoBanco(e);
+      }
+    }
   } catch (err) {}
 }
 
@@ -1205,6 +2471,12 @@ function cadastrarEmpresa() {
   const empresa = {
     id: 'EMP-' + Date.now(),
     nome: nomeEmpresa,
+    razaoSocial: document.getElementById('razaoSocial').value.trim(),
+    atividade: document.getElementById('atividade').value.trim(),
+    endereco: document.getElementById('endereco').value.trim(),
+    bairro: document.getElementById('bairro').value.trim(),
+    cep: document.getElementById('cep').value.trim(),
+    municipio: document.getElementById('municipio').value.trim(),
     responsavel: document.getElementById('responsavel').value,
     telefone: document.getElementById('telefone').value,
     whatsapp: document.getElementById('whatsapp').value,
@@ -1217,38 +2489,66 @@ function cadastrarEmpresa() {
   };
 
   // Limpa campos
-  ['empresa','responsavel','telefone','whatsapp','email','cnpj','obs'].forEach(id => document.getElementById(id).value = '');
+  ['empresa','razaoSocial','atividade','endereco','bairro','cep','municipio','responsavel','telefone','whatsapp','email','cnpj','obs'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('gestora').value = '';
+  _ultimoCNPJbuscado = '';
+  const st = document.getElementById('cnpjStatus'); if (st) st.textContent = '';
 
   empresas.push(empresa);
   renderizarEmpresas();
   popularSelectMatriz();
 }
 
-function toggleBrigada(idEmpresa) {
-  const tipo = document.getElementById(`tipoDoc-${idEmpresa}`).value;
-  document.getElementById(`brigadaBox-${idEmpresa}`).style.display =
-    tipo === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
-}
-
 function adicionarDocumento(idEmpresa) {
   const tipo = document.getElementById(`tipoDoc-${idEmpresa}`).value;
   const numeroDocumento = document.getElementById(`numeroDocumento-${idEmpresa}`).value;
-  const participantes = document.getElementById(`participantes-${idEmpresa}`).value;
   const emissao = document.getElementById(`emissaoDoc-${idEmpresa}`).value;
   const tipoValidade = document.getElementById(`tipoValidadeDoc-${idEmpresa}`).value;
   const quantidade = parseInt(document.getElementById(`quantidadeValidadeDoc-${idEmpresa}`).value);
 
-  if (!numeroDocumento || !emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+  const emAdequacao = !!(document.getElementById(`adequacao-${idEmpresa}`) && document.getElementById(`adequacao-${idEmpresa}`).checked);
 
-  let dataValidade = new Date(emissao);
+  if (!emAdequacao && !numeroDocumento) { mostrarToast('Preencha o Número do Documento.', true); return; }
+  if (!emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+
+  // Campos obrigatórios para Certificado de Conformidade
+  const numProcEl = document.getElementById(`numeroProcesso-${idEmpresa}`);
+  const gesProcEl = document.getElementById(`processoGestor-${idEmpresa}`);
+  const numeroProcesso = numProcEl ? numProcEl.value.trim() : '';
+  const processoGestor = gesProcEl ? gesProcEl.value.trim() : '';
+
+  if (!emAdequacao && tipo === 'Certificado de Conformidade') {
+    if (!numeroProcesso) { mostrarToast('Preencha o Número do Processo (obrigatório para Certificado de Conformidade).', true); return; }
+    if (gesProcEl && !processoGestor) { mostrarToast('Selecione a edificação gestora no Número do Processo Gestor (obrigatório para edificação gerida).', true); return; }
+  }
+
+  let dataValidade = new Date(emissao + 'T12:00:00');
   if (tipoValidade === 'anos') dataValidade.setFullYear(dataValidade.getFullYear() + quantidade);
   else dataValidade.setMonth(dataValidade.getMonth() + quantidade);
   const validade = dataValidade.toISOString().split('T')[0];
 
   const empresa = empresas.find(e => e.id === idEmpresa);
-  empresa.documentos.push({ tipo, numeroDocumento, participantes, emissao, validade, tipoValidade, quantidade });
+  // Persiste processo na empresa e no próprio documento
+  if (tipo === 'Certificado de Conformidade') {
+    empresa.numeroProcesso = numeroProcesso;
+    if (gesProcEl) empresa.processoGestor = processoGestor;
+  }
+  empresa.documentos.push({ tipo, numeroDocumento, emissao, validade, tipoValidade, quantidade,
+    emAdequacao,
+    numeroProcesso: tipo === 'Certificado de Conformidade' ? numeroProcesso : '',
+    processoGestor: tipo === 'Certificado de Conformidade' && gesProcEl ? processoGestor : ''
+  });
   renderizarEmpresas();
+}
+
+function salvarProcesso(idEmpresa) {
+  const empresa = empresas.find(e => e.id === idEmpresa);
+  if (!empresa) return;
+  const numEl = document.getElementById(`numeroProcesso-${idEmpresa}`);
+  const gesEl = document.getElementById(`processoGestor-${idEmpresa}`);
+  if (numEl) empresa.numeroProcesso = numEl.value;
+  if (gesEl) empresa.processoGestor = gesEl.value;
+  mostrarToast('✅ Processo salvo! Clique em CONCLUIR para gravar.');
 }
 
 function adicionarExtintor(idEmpresa) {
@@ -1268,24 +2568,34 @@ function adicionarExtintor(idEmpresa) {
 function editarDocumento(idEmpresa, index) {
   const empresa = empresas.find(e => e.id === idEmpresa);
   const doc = empresa.documentos[index];
+  const temGestora = !!empresa.gestoraId;
+  const isCertificado = doc.tipo === 'Certificado de Conformidade';
 
   document.getElementById('modalEdicaoTitulo').textContent = '✏️ Editar Documento';
   document.getElementById('modalEdicaoCampos').innerHTML = `
+    <div class="adequacao-wrap" style="margin-bottom:14px;">
+      <input type="checkbox" id="me-adequacao" ${doc.emAdequacao ? 'checked' : ''} onchange="toggleAdequacaoModal()">
+      <label for="me-adequacao">🔧 Em processo de adequação <span class="adequacao-hint">— campos de número passam a ser opcionais</span></label>
+    </div>
     <div class="modal-campo">
       <label>Tipo de Documento</label>
-      <select id="me-tipoDoc">
+      <select id="me-tipoDoc" onchange="toggleCamposProcessoModal(this.value, ${temGestora})">
         <option ${doc.tipo==='Certificado de Conformidade'?'selected':''}>Certificado de Conformidade</option>
         <option ${doc.tipo==='Atestado de Brigada de Incêndio'?'selected':''}>Atestado de Brigada de Incêndio</option>
-        <option ${doc.tipo==='AVCB'?'selected':''}>AVCB</option>
-        <option ${doc.tipo==='Laudo Técnico'?'selected':''}>Laudo Técnico</option>
-        <option ${doc.tipo==='Treinamento de Brigada'?'selected':''}>Treinamento de Brigada</option>
-        <option ${doc.tipo==='Plano de Emergência'?'selected':''}>Plano de Emergência</option>
       </select>
     </div>
     <div class="modal-campo">
-      <label>Número do Documento</label>
+      <label>Número do Documento <span id="me-estrelaDoc" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
       <input type="text" id="me-numero" value="${doc.numeroDocumento || ''}">
     </div>
+    <div class="modal-campo" id="me-campoNumeroProcesso" style="${isCertificado ? '' : 'display:none;'}">
+      <label>Número do Processo <span id="me-estrelaProc" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
+      <input type="text" id="me-numeroProcesso" value="${doc.numeroProcesso || empresa.numeroProcesso || ''}" placeholder="Ex: 12345/2024">
+    </div>
+    ${temGestora ? `<div class="modal-campo" id="me-campoProcessoGestor" style="${isCertificado ? '' : 'display:none;'}">
+      <label>Número do Processo Gestor <span id="me-estrelaGes" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
+      <select id="me-processoGestor">${opcoesProcessoGestor(empresa, doc.processoGestor || empresa.processoGestor || '')}</select>
+    </div>` : ''}
     <div class="modal-campo">
       <label>Data de Emissão</label>
       <input type="date" id="me-emissao" value="${doc.emissao || ''}">
@@ -1294,27 +2604,36 @@ function editarDocumento(idEmpresa, index) {
       <label>Data de Validade</label>
       <input type="date" id="me-validade" value="${doc.validade || ''}">
     </div>
-    <div class="modal-campo" id="me-brigadaBox" style="display:${doc.tipo==='Atestado de Brigada de Incêndio'?'block':'none'}">
-      <label>Participantes da Brigada</label>
-      <textarea id="me-participantes">${doc.participantes || ''}</textarea>
-    </div>
   `;
-
-  document.getElementById('me-tipoDoc').addEventListener('change', function() {
-    document.getElementById('me-brigadaBox').style.display =
-      this.value === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
-  });
 
   document.getElementById('modalEdicaoSalvar').onclick = function() {
     const novaValidade = document.getElementById('me-validade').value;
     const novaEmissao = document.getElementById('me-emissao').value;
     if (!novaValidade || !novaEmissao) { mostrarToast('Preencha as datas de emissão e validade.', true); return; }
-    doc.tipo = document.getElementById('me-tipoDoc').value;
+    const novoTipo = document.getElementById('me-tipoDoc').value;
+    const novoNumProc = document.getElementById('me-numeroProcesso') ? document.getElementById('me-numeroProcesso').value.trim() : '';
+    const novoGestorProc = document.getElementById('me-processoGestor') ? document.getElementById('me-processoGestor').value.trim() : '';
+    const meAdequacao = !!(document.getElementById('me-adequacao') && document.getElementById('me-adequacao').checked);
+
+    if (!meAdequacao && novoTipo === 'Certificado de Conformidade') {
+      if (!novoNumProc) { mostrarToast('Preencha o Número do Processo (obrigatório para Certificado de Conformidade).', true); return; }
+      if (temGestora && !novoGestorProc) { mostrarToast('Selecione a edificação gestora no Número do Processo Gestor (obrigatório para edificação gerida).', true); return; }
+    }
+
+    doc.tipo = novoTipo;
     doc.numeroDocumento = document.getElementById('me-numero').value;
     doc.emissao = novaEmissao;
     doc.validade = novaValidade;
-    const partEl = document.getElementById('me-participantes');
-    if (partEl) doc.participantes = partEl.value;
+    doc.emAdequacao = meAdequacao;
+    if (novoTipo === 'Certificado de Conformidade') {
+      doc.numeroProcesso = novoNumProc;
+      doc.processoGestor = novoGestorProc;
+      empresa.numeroProcesso = novoNumProc;
+      if (temGestora) empresa.processoGestor = novoGestorProc;
+    } else {
+      doc.numeroProcesso = '';
+      doc.processoGestor = '';
+    }
     fecharModalEdicao();
     renderizarEmpresas();
     mostrarToast('Documento atualizado.');
@@ -1387,15 +2706,19 @@ function excluirExtintor(idEmpresa, index) {
   renderizarEmpresas();
 }
 
-function concluirEmpresa(idEmpresa) {
+async function concluirEmpresa(idEmpresa) {
   const empresa = empresas.find(e => e.id === idEmpresa);
-  salvarNoBanco(empresa);
-  mostrarToast(`✅ "${empresa.nome}" salva com sucesso!`);
-  empresas = empresas.filter(e => e.id !== idEmpresa);
-  renderizarEmpresas();
-  popularSelectMatriz();
-  atualizarContadorAlertas();
-  renderizarDashboard();
+  mostrarCarregando('Salvando edificação...');
+  const ok = await salvarNoBanco(empresa);
+  ocultarCarregando();
+  if (ok) {
+    mostrarToast(`✅ "${empresa.nome}" salva com sucesso!`);
+    empresas = empresas.filter(e => e.id !== idEmpresa);
+    renderizarEmpresas();
+    popularSelectMatriz();
+    atualizarContadorAlertas();
+    renderizarDashboard();
+  }
 }
 
 function renderizarEmpresas() {
@@ -1408,6 +2731,9 @@ function renderizarEmpresas() {
     let html = `
       <div class="card empresa-card">
         <div class="empresa-titulo">${empresa.nome} | ID: ${empresa.id}</div>
+        ${empresa.razaoSocial ? `<p><b>Nome Empresarial:</b> ${empresa.razaoSocial}</p>` : ''}
+        ${empresa.atividade ? `<p><b>Atividade Econômica:</b> ${empresa.atividade}</p>` : ''}
+        ${(empresa.endereco || empresa.bairro || empresa.municipio || empresa.cep) ? `<p><b>Endereço:</b> ${[empresa.endereco, empresa.bairro, empresa.municipio, empresa.cep ? 'CEP ' + empresa.cep : ''].filter(Boolean).join(', ')}</p>` : ''}
         <p><b>Responsável:</b> ${empresa.responsavel}</p>
         <p><b>WhatsApp:</b> ${empresa.whatsapp}</p>
         <p><b>Email:</b> ${empresa.email}</p>
@@ -1416,19 +2742,24 @@ function renderizarEmpresas() {
 
         <div class="secao">
           <h2>Documentos da Edificação e Atestado de Brigada</h2>
+          <div class="adequacao-wrap">
+            <input type="checkbox" id="adequacao-${empresa.id}" onchange="toggleAdequacaoCadastro('${empresa.id}')">
+            <label for="adequacao-${empresa.id}">🔧 Edificação em processo de adequação <span class="adequacao-hint">— Nº do Documento, Nº do Processo e Nº do Processo Gestor passam a ser opcionais</span></label>
+          </div>
           <div class="grid">
-            <div><label>Número do Documento</label><input type="text" id="numeroDocumento-${empresa.id}"></div>
             <div>
               <label>Tipo de Documento</label>
-              <select id="tipoDoc-${empresa.id}" onchange="toggleBrigada('${empresa.id}')">
+              <select id="tipoDoc-${empresa.id}" onchange="toggleCamposProcesso('${empresa.id}')">
                 <option>Certificado de Conformidade</option>
                 <option>Atestado de Brigada de Incêndio</option>
-                <option>AVCB</option>
-                <option>Laudo Técnico</option>
-                <option>Treinamento de Brigada</option>
-                <option>Plano de Emergência</option>
               </select>
             </div>
+            <div><label>Número do Documento <span id="estrelaDoc-${empresa.id}" style="color:#b30000;">*</span></label><input type="text" id="numeroDocumento-${empresa.id}" placeholder="Ex: CC-2024-001"></div>
+            <div id="campoNumeroProcesso-${empresa.id}">
+              <label>Número do Processo <span id="estrelaProc-${empresa.id}" style="color:#b30000;">*</span></label>
+              <input type="text" id="numeroProcesso-${empresa.id}" placeholder="Ex: 12345/2024">
+            </div>
+            ${empresa.gestoraId ? `<div id="campoProcessoGestor-${empresa.id}"><label>Número do Processo Gestor <span id="estrelaGes-${empresa.id}" style="color:#b30000;">*</span></label><select id="processoGestor-${empresa.id}" onchange="atualizarInfoGestoraLista('${empresa.id}')">${opcoesProcessoGestor(empresa, '')}</select><div id="infoGestora-${empresa.id}" style="margin-top:6px;padding:8px 12px;background:#fff8e1;border-left:3px solid #f9a825;border-radius:6px;font-size:13px;display:none;"></div></div>` : ''}
             <div><label>Data de Emissão</label><input type="date" id="emissaoDoc-${empresa.id}"></div>
             <div>
               <label>Tipo de Validade</label>
@@ -1439,24 +2770,34 @@ function renderizarEmpresas() {
             </div>
             <div><label>Quantidade</label><input type="number" id="quantidadeValidadeDoc-${empresa.id}"></div>
           </div>
-          <div id="brigadaBox-${empresa.id}" style="display:none;margin-top:20px;">
-            <label>Participantes da Brigada</label>
-            <textarea id="participantes-${empresa.id}" placeholder="Digite um participante por linha"></textarea>
-          </div>
           <button onclick="adicionarDocumento('${empresa.id}')">ADICIONAR DOCUMENTO / ATESTADO</button>
           <table>
             <thead><tr>
-              <th>Tipo</th><th>Nº Doc</th><th>Participantes</th>
+              <th>Tipo</th><th>Nº Doc</th><th>Nº Processo</th>
               <th>Emissão</th><th>Periodicidade</th><th>Validade</th><th>Status</th><th>Ações</th>
             </tr></thead>
             <tbody>
     `;
 
+    // Nº processo da gestora (se esta edificação for gerida)
+    const gestoraLista = empresa.gestoraId ? carregarBanco().find(g => g.id === empresa.gestoraId) : null;
+    const numProcGestoraLista = gestoraLista ? (gestoraLista.numeroProcesso || '—') : null;
+
     empresa.documentos.forEach((doc, index) => {
       const status = calcularStatus(doc.validade);
+      const numProcBase2 = doc.tipo === 'Certificado de Conformidade' ? (doc.numeroProcesso || empresa.numeroProcesso || '—') : '—';
+      let numProc2;
+      if (doc.tipo === 'Certificado de Conformidade' && numProcGestoraLista) {
+        const procGerida2 = numProcBase2 !== '—' ? numProcBase2 : '—';
+        const nomeGest2 = gestoraLista ? gestoraLista.nome : '';
+        numProc2 = `<span style="display:block;font-weight:bold;">${procGerida2}</span><span style="display:block;margin-top:4px;padding:3px 7px;background:#fff8e1;border-left:3px solid #f9a825;border-radius:4px;font-size:11px;color:#7a5800;" title="Nº Processo da Gestora${nomeGest2 ? ': '+nomeGest2 : ''}">🏛️ Gestora: <b>${numProcGestoraLista}</b>${nomeGest2 ? ' — '+nomeGest2 : ''}</span>`;
+      } else {
+        numProc2 = numProcBase2;
+      }
+      const adequacaoBadge = doc.emAdequacao ? `<br><span style="font-size:10px;background:#fff8e1;color:#7a5800;border:1px solid #f9a825;border-radius:10px;padding:1px 6px;font-weight:bold;">🔧 ADEQUAÇÃO</span>` : '';
       html += `<tr>
-        <td>${doc.tipo}</td><td>${doc.numeroDocumento}</td>
-        <td style="white-space:pre-line;text-align:left;">${doc.participantes || '-'}</td>
+        <td>${doc.tipo}${adequacaoBadge}</td><td>${doc.numeroDocumento || '—'}</td>
+        <td>${numProc2}</td>
         <td>${formatarDataBR(doc.emissao)}</td><td>${doc.quantidade} ${doc.tipoValidade}</td>
         <td>${formatarDataBR(doc.validade)}</td>
         <td class="${status.classe}">${status.texto}</td>
@@ -1603,9 +2944,22 @@ function renderizarDetalhe() {
   if (e.gestoraId) {
     const gestora = banco.find(m => m.id === e.gestoraId);
     const nomeGestora = gestora ? gestora.nome : '(gestora removida)';
+    const numProcGerida  = e.numeroProcesso || '—';
+    const numProcGestora = gestora ? (gestora.numeroProcesso || '—') : '—';
     const linkGestora = gestora ? `<span style="color:#0055aa;cursor:pointer;text-decoration:underline;" onclick="fecharDetalhe();setTimeout(()=>abrirDetalhe('${gestora.id}'),200)">🔗 Ver gestora</span>` : '';
-    hierarquiaHtml = `<div style="background:#fff8e1;border-left:4px solid #f9a825;padding:10px 16px;border-radius:6px;margin-bottom:16px;">
-      🏢 <b>EDIFICAÇÃO GERIDA</b> — vinculada à gestora: <b>${nomeGestora}</b> ${linkGestora}
+    hierarquiaHtml = `<div style="background:#fff8e1;border-left:4px solid #f9a825;padding:12px 16px;border-radius:8px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:bold;color:#7a5800;margin-bottom:8px;">🏢 EDIFICAÇÃO GERIDA — vinculada à gestora: <b style="color:#555;">${nomeGestora}</b> &nbsp;${linkGestora}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <div style="background:white;border:1.5px solid #f9a825;border-radius:6px;padding:6px 14px;text-align:center;">
+          <div style="font-size:10px;color:#999;font-weight:bold;letter-spacing:0.5px;text-transform:uppercase;">Nº Processo (Esta Edif.)</div>
+          <div style="font-size:18px;font-weight:bold;color:#333;">${numProcGerida}</div>
+        </div>
+        <div style="font-size:20px;color:#f9a825;font-weight:bold;">→</div>
+        <div style="background:#fff3cd;border:1.5px solid #f9a825;border-radius:6px;padding:6px 14px;text-align:center;">
+          <div style="font-size:10px;color:#7a5800;font-weight:bold;letter-spacing:0.5px;text-transform:uppercase;">Nº Processo Gestora</div>
+          <div style="font-size:18px;font-weight:bold;color:#7a5800;">${numProcGestora}</div>
+        </div>
+      </div>
     </div>`;
   } else {
     const geridas = banco.filter(f => f.gestoraId === e.id && f.id !== e.id);
@@ -1622,6 +2976,12 @@ function renderizarDetalhe() {
     ${hierarquiaHtml}
     <div class="grid" style="margin-bottom:20px;">
       <p><b>ID:</b> ${e.id}</p>
+      ${e.razaoSocial ? `<p><b>Nome Empresarial:</b> ${e.razaoSocial}</p>` : ''}
+      ${e.atividade ? `<p><b>Atividade Econômica:</b> ${e.atividade}</p>` : ''}
+      ${e.endereco ? `<p><b>Endereço:</b> ${e.endereco}</p>` : ''}
+      ${e.bairro ? `<p><b>Bairro:</b> ${e.bairro}</p>` : ''}
+      ${e.municipio ? `<p><b>Município/UF:</b> ${e.municipio}</p>` : ''}
+      ${e.cep ? `<p><b>CEP:</b> ${e.cep}</p>` : ''}
       <p><b>Responsável:</b> ${e.responsavel}</p>
       <p><b>Telefone:</b> ${e.telefone}</p>
       <p><b>WhatsApp:</b> ${e.whatsapp}</p>
@@ -1640,17 +3000,24 @@ function renderizarDetalhe() {
 
     <div class="secao">
       <h2>Documentos</h2>
+      <div class="adequacao-wrap">
+        <input type="checkbox" id="det-adequacao" onchange="toggleAdequacaoDet()">
+        <label for="det-adequacao">🔧 Edificação em processo de adequação <span class="adequacao-hint">— Nº do Documento, Nº do Processo e Nº do Processo Gestor passam a ser opcionais</span></label>
+      </div>
       <div class="grid">
-        <div><label>Número do Documento</label><input type="text" id="det-numeroDocumento"></div>
         <div>
           <label>Tipo de Documento</label>
-          <select id="det-tipoDoc" onchange="toggleBrigadaDetalhe()">
+          <select id="det-tipoDoc" onchange="toggleCamposProcessoDet()">
             <option>Certificado de Conformidade</option>
             <option>Atestado de Brigada de Incêndio</option>
-            <option>AVCB</option><option>Laudo Técnico</option>
-            <option>Treinamento de Brigada</option><option>Plano de Emergência</option>
           </select>
         </div>
+        <div><label>Número do Documento <span id="det-estrelaDoc" style="color:#b30000;">*</span></label><input type="text" id="det-numeroDocumento" placeholder="Ex: CC-2024-001"></div>
+        <div id="det-campoNumeroProcesso">
+          <label>Número do Processo <span id="det-estrelaProc" style="color:#b30000;">*</span></label>
+          <input type="text" id="det-numeroProcesso" placeholder="Ex: 12345/2024" value="${e.numeroProcesso || ''}">
+        </div>
+        ${e.gestoraId ? `<div id="det-campoProcessoGestor"><label>Número do Processo Gestor <span id="det-estrelaGes" style="color:#b30000;">*</span></label><select id="det-processoGestor" onchange="atualizarInfoGestoraDet()">${opcoesProcessoGestor(e, e.processoGestor || '')}</select><div id="det-infoGestora" style="margin-top:6px;padding:8px 12px;background:#fff8e1;border-left:3px solid #f9a825;border-radius:6px;font-size:13px;display:none;"></div></div>` : ''}
         <div><label>Data de Emissão</label><input type="date" id="det-emissaoDoc"></div>
         <div>
           <label>Tipo de Validade</label>
@@ -1658,22 +3025,33 @@ function renderizarDetalhe() {
         </div>
         <div><label>Quantidade</label><input type="number" id="det-quantidadeValidadeDoc"></div>
       </div>
-      <div id="det-brigadaBox" style="display:none;margin-top:20px;">
-        <label>Participantes da Brigada</label>
-        <textarea id="det-participantes" placeholder="Digite um participante por linha"></textarea>
-      </div>
       <button onclick="adicionarDocumentoDetalhe()">ADICIONAR DOCUMENTO</button>
       <table><thead><tr>
-        <th>Tipo</th><th>Nº Doc</th><th>Participantes</th>
+      <th>Tipo</th><th>Nº Doc</th><th>Nº Processo</th>
         <th>Emissão</th><th>Periodicidade</th><th>Validade</th><th>Status</th><th>Ações</th>
       </tr></thead><tbody>
   `;
 
+  // Nº processo da gestora (se esta edificação for gerida)
+  const gestoraDet = e.gestoraId ? carregarBanco().find(g => g.id === e.gestoraId) : null;
+  const numProcGestoraDet = gestoraDet ? (gestoraDet.numeroProcesso || '—') : null;
+
   e.documentos.forEach((doc, index) => {
     const status = calcularStatus(doc.validade);
+    const numProcBase = doc.tipo === 'Certificado de Conformidade' ? (doc.numeroProcesso || e.numeroProcesso || '—') : '—';
+    // Se é edificação gerida e é Certificado de Conformidade, exibe: Nº Gerida + Nº Gestora logo abaixo
+    let numProc;
+    if (doc.tipo === 'Certificado de Conformidade' && numProcGestoraDet) {
+      const procGerida = numProcBase !== '—' ? numProcBase : '—';
+      const nomeGestora = gestoraDet ? gestoraDet.nome : '';
+      numProc = `<span style="display:block;font-weight:bold;">${procGerida}</span><span style="display:block;margin-top:4px;padding:3px 7px;background:#fff8e1;border-left:3px solid #f9a825;border-radius:4px;font-size:11px;color:#7a5800;" title="Nº Processo da Gestora${nomeGestora ? ': '+nomeGestora : ''}">🏛️ Gestora: <b>${numProcGestoraDet}</b>${nomeGestora ? ' — '+nomeGestora : ''}</span>`;
+    } else {
+      numProc = numProcBase;
+    }
+    const adequacaoBadge = doc.emAdequacao ? `<br><span style="font-size:10px;background:#fff8e1;color:#7a5800;border:1px solid #f9a825;border-radius:10px;padding:1px 6px;font-weight:bold;">🔧 ADEQUAÇÃO</span>` : '';
     html += `<tr>
-      <td>${doc.tipo}</td><td>${doc.numeroDocumento}</td>
-      <td style="white-space:pre-line;text-align:left;">${doc.participantes || '-'}</td>
+      <td>${doc.tipo}${adequacaoBadge}</td><td>${doc.numeroDocumento || '—'}</td>
+      <td>${numProc}</td>
       <td>${formatarDataBR(doc.emissao)}</td><td>${doc.quantidade} ${doc.tipoValidade}</td>
       <td>${formatarDataBR(doc.validade)}</td>
       <td class="${status.classe}">${status.texto}</td>
@@ -1749,6 +3127,8 @@ function renderizarDetalhe() {
     </div>`;
 
   document.getElementById('detalheConteudo').innerHTML = html;
+  // Exibe info da gestora se já houver valor pré-selecionado no campo inline
+  setTimeout(atualizarInfoGestoraDet, 50);
 }
 
 function agendarGoogleAgendaDoc(index) {
@@ -1791,29 +3171,45 @@ function agendarGoogleAgendaExt(index) {
   }
 }
 
-function toggleBrigadaDetalhe() {
-  const tipo = document.getElementById('det-tipoDoc').value;
-  document.getElementById('det-brigadaBox').style.display =
-    tipo === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
-}
-
 function adicionarDocumentoDetalhe() {
   const tipo = document.getElementById('det-tipoDoc').value;
   const numeroDocumento = document.getElementById('det-numeroDocumento').value;
-  const participantes = document.getElementById('det-participantes').value;
   const emissao = document.getElementById('det-emissaoDoc').value;
   const tipoValidade = document.getElementById('det-tipoValidadeDoc').value;
   const quantidade = parseInt(document.getElementById('det-quantidadeValidadeDoc').value);
 
-  if (!numeroDocumento || !emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+  const emAdequacaoDet = !!(document.getElementById('det-adequacao') && document.getElementById('det-adequacao').checked);
 
-  let dataValidade = new Date(emissao);
+  if (!emAdequacaoDet && !numeroDocumento) { mostrarToast('Preencha o Número do Documento.', true); return; }
+  if (!emissao || !quantidade) { mostrarToast('Preencha os dados do documento.', true); return; }
+
+  const npEl = document.getElementById('det-numeroProcesso');
+  const pgEl = document.getElementById('det-processoGestor');
+  const numeroProcesso = npEl ? npEl.value.trim() : '';
+  const processoGestor = pgEl ? pgEl.value.trim() : '';
+
+  if (!emAdequacaoDet && tipo === 'Certificado de Conformidade') {
+    if (!numeroProcesso) { mostrarToast('Preencha o Número do Processo (obrigatório para Certificado de Conformidade).', true); return; }
+    if (pgEl && !processoGestor) { mostrarToast('Selecione a edificação gestora no Número do Processo Gestor (obrigatório para edificação gerida).', true); return; }
+  }
+
+  if (tipo === 'Certificado de Conformidade') {
+    if (npEl) empresaDetalhe.numeroProcesso = numeroProcesso;
+    if (pgEl) empresaDetalhe.processoGestor = processoGestor;
+  }
+
+  let dataValidade = new Date(emissao + 'T12:00:00');
   if (tipoValidade === 'anos') dataValidade.setFullYear(dataValidade.getFullYear() + quantidade);
   else dataValidade.setMonth(dataValidade.getMonth() + quantidade);
   const validade = dataValidade.toISOString().split('T')[0];
 
-  empresaDetalhe.documentos.push({ tipo, numeroDocumento, participantes, emissao, validade, tipoValidade, quantidade });
+  empresaDetalhe.documentos.push({ tipo, numeroDocumento, emissao, validade, tipoValidade, quantidade,
+    emAdequacao: emAdequacaoDet,
+    numeroProcesso: tipo === 'Certificado de Conformidade' ? numeroProcesso : '',
+    processoGestor: tipo === 'Certificado de Conformidade' && pgEl ? processoGestor : ''
+  });
   renderizarDetalhe();
+  autoSyncDetalhe('✅ Documento adicionado e salvo no Sheets!');
 }
 
 function adicionarExtintorDetalhe() {
@@ -1825,6 +3221,7 @@ function adicionarExtintorDetalhe() {
   if (!numero) { mostrarToast('Informe o número do extintor.', true); return; }
   empresaDetalhe.extintores.push({ numero, agente, capacidade, validadeRecarga, validadeHidro });
   renderizarDetalhe();
+  autoSyncDetalhe('✅ Extintor adicionado e salvo no Sheets!');
 }
 
 function fecharModalEdicao() {
@@ -1833,59 +3230,98 @@ function fecharModalEdicao() {
 
 function editarDocumentoDetalhe(index) {
   const doc = empresaDetalhe.documentos[index];
+  const temGestora = !!empresaDetalhe.gestoraId;
+  const isCertificado = doc.tipo === 'Certificado de Conformidade';
 
   document.getElementById('modalEdicaoTitulo').textContent = '✏️ Editar Documento';
   document.getElementById('modalEdicaoCampos').innerHTML = `
+    <div class="adequacao-wrap" style="margin-bottom:14px;">
+      <input type="checkbox" id="me-adequacao" ${doc.emAdequacao ? 'checked' : ''} onchange="toggleAdequacaoModal()">
+      <label for="me-adequacao">🔧 Em processo de adequação <span class="adequacao-hint">— campos de número passam a ser opcionais</span></label>
+    </div>
     <div class="modal-campo">
       <label>Tipo de Documento</label>
-      <select id="me-tipoDoc">
+      <select id="me-tipoDoc" onchange="toggleCamposProcessoModal(this.value, ${temGestora})">
         <option ${doc.tipo==='Certificado de Conformidade'?'selected':''}>Certificado de Conformidade</option>
         <option ${doc.tipo==='Atestado de Brigada de Incêndio'?'selected':''}>Atestado de Brigada de Incêndio</option>
-        <option ${doc.tipo==='AVCB'?'selected':''}>AVCB</option>
-        <option ${doc.tipo==='Laudo Técnico'?'selected':''}>Laudo Técnico</option>
-        <option ${doc.tipo==='Treinamento de Brigada'?'selected':''}>Treinamento de Brigada</option>
-        <option ${doc.tipo==='Plano de Emergência'?'selected':''}>Plano de Emergência</option>
       </select>
     </div>
     <div class="modal-campo">
-      <label>Número do Documento</label>
+      <label>Número do Documento <span id="me-estrelaDoc" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
       <input type="text" id="me-numero" value="${doc.numeroDocumento || ''}">
     </div>
+    <div class="modal-campo" id="me-campoNumeroProcesso" style="${isCertificado ? '' : 'display:none;'}">
+      <label>Número do Processo <span id="me-estrelaProc" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
+      <input type="text" id="me-numeroProcesso" value="${doc.numeroProcesso || empresaDetalhe.numeroProcesso || ''}" placeholder="Ex: 12345/2024">
+    </div>
+    ${temGestora ? `<div class="modal-campo" id="me-campoProcessoGestor" style="${isCertificado ? '' : 'display:none;'}">
+      <label>Número do Processo Gestor <span id="me-estrelaGes" style="color:#b30000;${doc.emAdequacao?'display:none':''}">*</span></label>
+      <select id="me-processoGestor" onchange="atualizarInfoGestoraModal()">${opcoesProcessoGestor(empresaDetalhe, doc.processoGestor || empresaDetalhe.processoGestor || '')}</select>
+      <div id="me-infoGestora" style="margin-top:6px;padding:8px 12px;background:#fff8e1;border-left:3px solid #f9a825;border-radius:6px;font-size:13px;display:none;"></div>
+    </div>` : ''}
     <div class="modal-campo">
       <label>Data de Emissão</label>
       <input type="date" id="me-emissao" value="${doc.emissao || ''}">
     </div>
     <div class="modal-campo">
-      <label>Data de Validade <span style="font-weight:normal;color:#888;">(editável diretamente)</span></label>
+      <label>Tipo de Validade</label>
+      <select id="me-tipoValidade">
+        <option value="anos" ${(doc.tipoValidade||'anos')==='anos'?'selected':''}>Anos</option>
+        <option value="meses" ${doc.tipoValidade==='meses'?'selected':''}>Meses</option>
+      </select>
+    </div>
+    <div class="modal-campo">
+      <label>Quantidade de Validade</label>
+      <input type="number" id="me-quantidade" min="1" value="${doc.quantidade || 1}">
+    </div>
+    <div class="modal-campo">
+      <label>Data de Validade <span style="font-weight:normal;color:#888;">(recalculada automaticamente ou edite direto)</span></label>
       <input type="date" id="me-validade" value="${doc.validade || ''}">
     </div>
-    <div class="modal-campo" id="me-brigadaBox" style="display:${doc.tipo==='Atestado de Brigada de Incêndio'?'block':'none'}">
-      <label>Participantes da Brigada</label>
-      <textarea id="me-participantes">${doc.participantes || ''}</textarea>
-    </div>
   `;
-
-  // Mostrar/ocultar campo de participantes ao trocar tipo
-  document.getElementById('me-tipoDoc').addEventListener('change', function() {
-    document.getElementById('me-brigadaBox').style.display =
-      this.value === 'Atestado de Brigada de Incêndio' ? 'block' : 'none';
-  });
 
   document.getElementById('modalEdicaoSalvar').onclick = function() {
     const novaValidade = document.getElementById('me-validade').value;
     const novaEmissao = document.getElementById('me-emissao').value;
     if (!novaValidade || !novaEmissao) { mostrarToast('Preencha as datas de emissão e validade.', true); return; }
-    doc.tipo = document.getElementById('me-tipoDoc').value;
-    doc.numeroDocumento = document.getElementById('me-numero').value;
+    const novoTipo = document.getElementById('me-tipoDoc').value;
+    const novoNumero = document.getElementById('me-numero').value;
+    const novoNumProc = document.getElementById('me-numeroProcesso') ? document.getElementById('me-numeroProcesso').value.trim() : '';
+    const novoGestorProc = document.getElementById('me-processoGestor') ? document.getElementById('me-processoGestor').value.trim() : '';
+    const meAdequacao = !!(document.getElementById('me-adequacao') && document.getElementById('me-adequacao').checked);
+
+    if (!meAdequacao && novoTipo === 'Certificado de Conformidade') {
+      if (!novoNumProc) { mostrarToast('Preencha o Número do Processo (obrigatório para Certificado de Conformidade).', true); return; }
+      if (temGestora && !novoGestorProc) { mostrarToast('Selecione a edificação gestora no Número do Processo Gestor (obrigatório para edificação gerida).', true); return; }
+    }
+
+    const novoTipoValidade = document.getElementById('me-tipoValidade').value;
+    const novaQuantidade = parseInt(document.getElementById('me-quantidade').value) || 1;
+
+    doc.tipo = novoTipo;
+    doc.numeroDocumento = novoNumero;
     doc.emissao = novaEmissao;
+    doc.tipoValidade = novoTipoValidade;
+    doc.quantidade = novaQuantidade;
     doc.validade = novaValidade;
-    doc.participantes = document.getElementById('me-participantes') ? document.getElementById('me-participantes').value : doc.participantes;
+    doc.emAdequacao = meAdequacao;
+    if (novoTipo === 'Certificado de Conformidade') {
+      doc.numeroProcesso = novoNumProc;
+      doc.processoGestor = novoGestorProc;
+      empresaDetalhe.numeroProcesso = novoNumProc;
+      if (temGestora) empresaDetalhe.processoGestor = novoGestorProc;
+    } else {
+      doc.numeroProcesso = '';
+      doc.processoGestor = '';
+    }
     fecharModalEdicao();
     renderizarDetalhe();
     mostrarToast('Documento atualizado. Clique em SALVAR para confirmar.');
   };
 
   document.getElementById('modalEdicaoOverlay').classList.add('aberto');
+  // Exibe info da gestora se já houver valor pré-selecionado
+  setTimeout(atualizarInfoGestoraModal, 50);
 }
 
 function excluirDocumentoDetalhe(index) {
@@ -1961,25 +3397,47 @@ function editarDadosEmpresa() {
 
   document.getElementById('modalEdicaoTitulo').textContent = '✏️ Editar Dados da Edificação';
   document.getElementById('modalEdicaoCampos').innerHTML = `
-    <div class="modal-campo"><label>Edificação</label><input id="me-nome" value="${e.nome || ''}"></div>
-    <div class="modal-campo"><label>Responsável</label><input id="me-resp" value="${e.responsavel || ''}"></div>
+    <div class="cnpj-destaque" style="margin-bottom:14px;">
+      <label style="font-size:15px;">CNPJ <span style="font-weight:normal;color:#888;">— digite o CNPJ e o sistema busca os dados na Receita Federal</span></label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <input id="me-cnpj" value="${e.cnpj || ''}" oninput="mascaraCNPJ(this)" maxlength="18" placeholder="00.000.000/0000-00" style="flex:1;font-size:17px;padding:12px;">
+        <button type="button" class="btn-azul" style="margin-top:0;white-space:nowrap;" onclick="buscarDadosCNPJ({contexto:'edicao',forcar:true})" title="Buscar dados do CNPJ na Receita Federal">🔍 Buscar dados</button>
+      </div>
+      <small id="me-cnpjStatus" style="display:block;margin-top:6px;font-size:13px;"></small>
+    </div>
+    <div class="modal-campo"><label>Nome Empresarial <span style="font-weight:normal;color:#888;">— razão social</span></label><input id="me-razao" value="${e.razaoSocial || ''}"></div>
+    <div class="modal-campo"><label>Nome Fantasia / Edificação <span style="color:#b30000;">*</span></label><input id="me-nome" value="${e.nome || ''}"></div>
+    <div class="modal-campo"><label>Atividade Econômica</label><input id="me-atividade" value="${e.atividade || ''}" placeholder="CNAE principal"></div>
+    <div class="modal-campo"><label>Endereço</label><input id="me-endereco" value="${e.endereco || ''}" placeholder="Logradouro, nº, complemento"></div>
+    <div class="modal-campo"><label>Bairro</label><input id="me-bairro" value="${e.bairro || ''}"></div>
+    <div class="modal-campo"><label>CEP</label><input id="me-cep" value="${e.cep || ''}" placeholder="00000-000"></div>
+    <div class="modal-campo"><label>Município / UF</label><input id="me-municipio" value="${e.municipio || ''}" placeholder="Cidade/UF"></div>
     <div class="modal-campo"><label>Telefone</label><input id="me-tel" value="${e.telefone || ''}"></div>
     <div class="modal-campo"><label>WhatsApp</label><input id="me-wa" value="${e.whatsapp || ''}"></div>
     <div class="modal-campo"><label>Email</label><input id="me-email" type="email" value="${e.email || ''}"></div>
-    <div class="modal-campo"><label>CNPJ</label><input id="me-cnpj" value="${e.cnpj || ''}" oninput="mascaraCNPJ(this)" maxlength="18" placeholder="00.000.000/0000-00"></div>
+    <div class="modal-campo"><label>Responsável</label><input id="me-resp" value="${e.responsavel || ''}"></div>
     <div class="modal-campo"><label>Edificação Gestora</label><select id="me-gestora">${opcoesGestora}</select></div>
     <div class="modal-campo"><label>Observações</label><textarea id="me-obs">${e.obs || ''}</textarea></div>
   `;
+  _ultimoCNPJbuscado = ''; // permite rebuscar o CNPJ já existente nesta edificação
 
   document.getElementById('modalEdicaoSalvar').onclick = function() {
-    e.nome       = document.getElementById('me-nome').value;
-    e.responsavel= document.getElementById('me-resp').value;
-    e.telefone   = document.getElementById('me-tel').value;
-    e.whatsapp   = document.getElementById('me-wa').value;
-    e.email      = document.getElementById('me-email').value;
-    e.cnpj       = document.getElementById('me-cnpj').value;
-    e.gestoraId  = document.getElementById('me-gestora').value;
-    e.obs        = document.getElementById('me-obs').value;
+    const novoNome = document.getElementById('me-nome').value.trim();
+    if (!novoNome) { mostrarToast('Preencha o Nome Fantasia / Edificação.', true); return; }
+    e.nome        = novoNome;
+    e.razaoSocial = document.getElementById('me-razao').value;
+    e.atividade   = document.getElementById('me-atividade').value;
+    e.endereco    = document.getElementById('me-endereco').value;
+    e.bairro      = document.getElementById('me-bairro').value;
+    e.cep         = document.getElementById('me-cep').value;
+    e.municipio   = document.getElementById('me-municipio').value;
+    e.responsavel = document.getElementById('me-resp').value;
+    e.telefone    = document.getElementById('me-tel').value;
+    e.whatsapp    = document.getElementById('me-wa').value;
+    e.email       = document.getElementById('me-email').value;
+    e.cnpj        = document.getElementById('me-cnpj').value;
+    e.gestoraId   = document.getElementById('me-gestora').value;
+    e.obs         = document.getElementById('me-obs').value;
     fecharModalEdicao();
     renderizarDetalhe();
     mostrarToast('Dados atualizados. Clique em SALVAR para confirmar.');
@@ -1988,24 +3446,65 @@ function editarDadosEmpresa() {
   document.getElementById('modalEdicaoOverlay').classList.add('aberto');
 }
 
-function salvarDetalheNoBanco() {
-  salvarNoBanco(empresaDetalhe);
-  mostrarToast(`✅ "${empresaDetalhe.nome}" atualizada com sucesso!`);
-  popularSelectMatriz();
-  pesquisarEmpresas();
-  atualizarContadorAlertas();
-  renderizarAlertas();
-  renderizarDashboard();
+async function salvarDetalheNoBanco() {
+  const npEl = document.getElementById('det-numeroProcesso');
+  const pgEl = document.getElementById('det-processoGestor');
+  if (npEl) empresaDetalhe.numeroProcesso = npEl.value;
+  if (pgEl) empresaDetalhe.processoGestor = pgEl.value;
+  mostrarCarregando('Salvando alterações...');
+  const ok = await salvarNoBanco(empresaDetalhe);
+  ocultarCarregando();
+  if (ok) {
+    // Sincroniza empresaDetalhe com os dados frescos que voltaram do Sheets
+    const fresco = carregarBanco().find(e => e.id === empresaDetalhe.id);
+    if (fresco) empresaDetalhe = JSON.parse(JSON.stringify(fresco));
+    mostrarToast(`✅ "${empresaDetalhe.nome}" atualizada com sucesso!`);
+    popularSelectMatriz();
+    pesquisarEmpresas();
+    atualizarContadorAlertas();
+    renderizarAlertas();
+    renderizarDashboard();
+    renderizarDetalhe();
+  }
 }
 
-function excluirEmpresa(id) {
+// Salva automaticamente no banco após qualquer alteração no detalhe (sem exigir clique manual)
+async function autoSyncDetalhe(msgSucesso) {
+  const npEl = document.getElementById('det-numeroProcesso');
+  const pgEl = document.getElementById('det-processoGestor');
+  if (npEl) empresaDetalhe.numeroProcesso = npEl.value;
+  if (pgEl) empresaDetalhe.processoGestor = pgEl.value;
+  mostrarCarregando('Salvando no Google Sheets...');
+  const ok = await salvarNoBanco(empresaDetalhe);
+  ocultarCarregando();
+  if (ok) {
+    // Sincroniza empresaDetalhe com os dados frescos que voltaram do Sheets
+    const fresco = carregarBanco().find(e => e.id === empresaDetalhe.id);
+    if (fresco) empresaDetalhe = JSON.parse(JSON.stringify(fresco));
+    mostrarToast(msgSucesso || '✅ Alteração salva automaticamente!');
+    popularSelectMatriz();
+    pesquisarEmpresas();
+    atualizarContadorAlertas();
+    renderizarAlertas();
+    renderizarDashboard();
+    renderizarDetalhe();
+  } else {
+    mostrarToast('⚠️ Alteração aplicada localmente, mas falhou ao salvar no Sheets. Clique em SALVAR para tentar novamente.', true);
+  }
+}
+
+async function excluirEmpresa(id) {
   if (!confirm('Tem certeza que deseja EXCLUIR esta edificação e todos os seus dados?')) return;
-  excluirDoBanco(id);
-  mostrarToast('Edificação excluída.');
-  popularSelectMatriz();
-  fecharDetalhe();
-  pesquisarEmpresas();
-  atualizarContadorAlertas();
+  mostrarCarregando('Excluindo edificação...');
+  const ok = await excluirDoBanco(id);
+  ocultarCarregando();
+  if (ok) {
+    mostrarToast('Edificação excluída.');
+    popularSelectMatriz();
+    fecharDetalhe();
+    pesquisarEmpresas();
+    atualizarContadorAlertas();
+  }
 }
 
 // ============ TEMA ESCURO ============
@@ -2073,6 +3572,12 @@ function gerarPizzaSVG(validos, aVencer, vencidos, total) {
 
 document.addEventListener('keydown', function(ev) {
   if (ev.key !== 'Escape') return;
+  if (document.getElementById('adminOverlay').classList.contains('aberto')) {
+    fecharPainelAdmin(); return;
+  }
+  if (document.getElementById('recuperarOverlay').classList.contains('aberto')) {
+    fecharRecuperarSenha(); return;
+  }
   if (document.getElementById('modalEdicaoOverlay').classList.contains('aberto')) {
     fecharModalEdicao(); return;
   }
@@ -2087,9 +3592,8 @@ document.addEventListener('keydown', function(ev) {
 // Inicialização
 carregarTema();
 inicializarSenha();
-migrarParaGestoraId();
 verificarAutenticacao();
-popularSelectMatriz();
+
 </script>
 </body>
 </html>
