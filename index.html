@@ -427,9 +427,7 @@
       <button class="recuperar-link" onclick="abrirRecuperarSenha()">🔑 Esqueci minha senha</button>
     </div>
 
-    <div class="login-hint" id="loginHint" style="display:none;">
-      🔑 Senha padrão definida pelo administrador. Entre e troque a senha em <b>"Alterar senha"</b>.
-    </div>
+
   </div>
 </div>
 
@@ -472,6 +470,7 @@
       <button class="admin-tab ativo" onclick="adminMudarAba('usuarios')">👥 Usuários</button>
       <button class="admin-tab" onclick="adminMudarAba('codigo')">🔑 Código de Recuperação</button>
       <button class="admin-tab" onclick="adminMudarAba('senhaadmin')">🔒 Senha do Admin</button>
+      <button class="admin-tab" onclick="adminMudarAba('sincronizar')">🔄 Sincronizar Acesso</button>
     </div>
 
     <!-- ABA: USUÁRIOS -->
@@ -520,6 +519,31 @@
       </div>
       <div class="login-erro" id="adminSenhaErro"></div>
       <button class="btn-verde" onclick="salvarSenhaAdmin()" style="margin-top:6px;">✅ Redefinir senha do admin</button>
+    </div>
+
+    <!-- ABA: SINCRONIZAR ACESSO -->
+    <div id="adminSecao-sincronizar" class="admin-secao">
+      <p style="color:#666;font-size:13px;margin-top:0;">
+        As senhas ficam salvas <strong>apenas neste navegador/dispositivo</strong>. Use estas opções para transferir as credenciais para outros dispositivos.
+      </p>
+      <div style="background:#fff8e1;border-radius:8px;padding:12px 14px;font-size:13px;color:#7a5800;margin-bottom:16px;">
+        ⚠️ <strong>Como usar:</strong> No dispositivo onde você já configurou as senhas, clique em <em>"Gerar credenciais"</em>. Copie o texto gerado. No outro dispositivo, abra o Painel Admin &gt; Sincronizar Acesso, cole o texto e clique em <em>"Importar credenciais"</em>.
+      </div>
+      <div class="modal-campo">
+        <label>Exportar credenciais deste dispositivo</label>
+        <textarea id="exportCredenciaisOutput" rows="5" placeholder="Clique no botão abaixo para gerar..." readonly style="font-family:monospace;font-size:12px;resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-azul" onclick="exportarCredenciais()" style="margin-top:6px;">📤 Gerar credenciais</button>
+        <button class="btn-cinza" onclick="copiarCredenciais()" style="margin-top:6px;">📋 Copiar texto</button>
+      </div>
+      <hr style="margin:18px 0;">
+      <div class="modal-campo">
+        <label>Importar credenciais de outro dispositivo</label>
+        <textarea id="importCredenciaisInput" rows="5" placeholder="Cole aqui o texto exportado do outro dispositivo..." style="font-family:monospace;font-size:12px;resize:vertical;"></textarea>
+      </div>
+      <div class="login-erro" id="sincronizarErro"></div>
+      <button class="btn-verde" onclick="importarCredenciais()" style="margin-top:6px;">📥 Importar credenciais</button>
     </div>
 
     <div style="display:flex;justify-content:flex-end;margin-top:18px;">
@@ -1138,7 +1162,7 @@ async function buscarDadosCNPJ(opts) {
 // barreira de acesso para o uso diário.
 
 // Hash padrão armazenado como referência (não expõe senha em texto claro)
-const _SENHA_PADRAO_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
+const _SENHA_PADRAO_HASH = '4441305b80c25c6fa8e9b85c727a2a6c1a2546e3c8087add63bdb8b22b35ff95';
 
 // ── PBKDF2 (hash criptográfico forte, Web Crypto API) ────────────────────────
 // Usado para todas as senhas novas e ao trocar senha.
@@ -1237,13 +1261,13 @@ function salvarUsuarios(usuarios) {
 
 function inicializarSenha() {
   try {
-    // Migra hash antigo para nova estrutura
+    // A senha do administrador é FIXA (@Combatfire911@) e não pode ser alterada.
+    // Sempre sobrescreve qualquer hash anterior com o djb2 da senha fixa.
     const usuarios = carregarUsuarios();
-    if (!usuarios.__admin__) {
-      const hashAntigo = localStorage.getItem('combatfire_admin_hash') || hashSenha('admin123');
-      usuarios.__admin__ = { nome: 'Administrador', hash: hashAntigo, tipo: 'admin' };
-      salvarUsuarios(usuarios);
-    }
+    usuarios.__admin__ = { nome: 'Administrador', hash: hashSenha('@Combatfire911@'), tipo: 'admin' };
+    salvarUsuarios(usuarios);
+    // Remove chave legada para evitar conflito
+    try { localStorage.removeItem('combatfire_admin_hash'); } catch(e) {}
   } catch (e) {}
 }
 
@@ -1252,13 +1276,13 @@ function senhaArmazenada(userId) {
   try {
     const usuarios = carregarUsuarios();
     if (usuarios[userId]) return usuarios[userId].hash;
-    if (userId === '__admin__') return localStorage.getItem('combatfire_admin_hash') || hashSenha('admin123');
   } catch(e) {}
-  return hashSenha('admin123');
+  // Fallback: retorna hash djb2 da senha fixa do admin
+  return hashSenha('@Combatfire911@');
 }
 
 function estaUsandoSenhaPadrao() {
-  return senhaArmazenada('__admin__') === hashSenha('admin123');
+  return senhaArmazenada('__admin__') === hashSenha('@Combatfire911@');
 }
 
 // ── Preenchimento do select de usuários no login ─────────────────────────────
@@ -1289,7 +1313,6 @@ function verificarAutenticacao() {
   } else {
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('headerActions').style.display = 'none';
-    document.getElementById('loginHint').style.display = estaUsandoSenhaPadrao() ? 'block' : 'none';
     setTimeout(() => { const c = document.getElementById('loginSenha'); if (c) c.focus(); }, 100);
   }
 }
@@ -1304,6 +1327,9 @@ async function revelarApp() {
     const userId = sessionStorage.getItem('combatfire_userid') || '__admin__';
     const btnAdmin = document.getElementById('btnAdmin');
     if (btnAdmin) btnAdmin.style.display = userId === '__admin__' ? 'inline-block' : 'none';
+    // Oculta "Alterar senha" para o admin — senha fixa, não editável
+    const btnAlterarSenha = document.querySelector('#headerActions button[onclick="abrirAlterarSenha()"]');
+    if (btnAlterarSenha) btnAlterarSenha.style.display = userId === '__admin__' ? 'none' : 'inline-block';
   } catch(e) {}
   mostrarCarregando('Carregando dados do Google Sheets...');
   try {
@@ -1329,46 +1355,7 @@ async function fazerLogin() {
     ? verificarSenha(senha, usuarioObj.hash, usuarioObj.salt)
     : verificarSenha(senha, senhaArmazenada(userId), undefined));
 
-  // Fallback de emergência para admin: só funciona se NÃO houver senha PBKDF2 salva
-  // (instalação limpa, localStorage vazio). Se o admin já trocou a senha, este
-  // bloco nunca é executado — hashStoredOk já terá resolvido o login acima.
-  const adminOk = await (async () => {
-    if (userId !== '__admin__' || hashStoredOk) return false;
-    // Só permite fallback se o admin ainda não possui hash PBKDF2 definido
-    const usuariosAtual = carregarUsuarios();
-    const adminAtual = usuariosAtual['__admin__'];
-    if (adminAtual && _ehHashPBKDF2(adminAtual.hash)) {
-      // Admin já tem senha PBKDF2 definida — não aceita fallback de forma alguma
-      return false;
-    }
-    // Instalação limpa: aceita admin123 via SHA-256
-    try {
-      const enc = new TextEncoder();
-      const buf = await crypto.subtle.digest('SHA-256', enc.encode(senha));
-      if (bufferParaHex(new Uint8Array(buf)) === _SENHA_PADRAO_HASH) return true;
-    } catch(e) {}
-    // Instalação limpa: aceita djb2 legado (salt fixo) para compatibilidade
-    const stored = senhaArmazenada('__admin__');
-    if (_ehHashPBKDF2(stored)) return false; // dupla checagem
-    if (_hashDjb2Legado(senha) === stored) return true;
-    if (_hashDjb2Legado(senha, 'combatfire$') === stored) return true;
-    return false;
-  })();
-
-  const hashOk = hashStoredOk;
-
-  if (hashOk || adminOk) {
-    if (adminOk && !hashOk) {
-      // Migra automaticamente o admin para hash PBKDF2 na primeira entrada com senha padrão
-      try {
-        const usuariosAdmin = carregarUsuarios();
-        const { hash, salt } = await hashSenhaNovo(senha);
-        if (!usuariosAdmin.__admin__) usuariosAdmin.__admin__ = { nome: 'Administrador', tipo: 'admin' };
-        usuariosAdmin.__admin__.hash = hash;
-        usuariosAdmin.__admin__.salt = salt;
-        salvarUsuarios(usuariosAdmin);
-      } catch(e) {}
-    }
+  if (hashStoredOk) {
     try {
       sessionStorage.setItem('combatfire_auth', 'ok');
       sessionStorage.setItem('combatfire_userid', userId);
@@ -1410,10 +1397,13 @@ function fecharAlterarSenha() {
 
 async function salvarNovaSenha() {
   const userId = (function(){ try { return sessionStorage.getItem('combatfire_userid') || '__admin__'; } catch(e){ return '__admin__'; } })();
-  const atual = document.getElementById('senhaAtual').value;
-  const nova = document.getElementById('senhaNova').value;
-  const confirma = document.getElementById('senhaConfirma').value;
   const erro = document.getElementById('senhaErro');
+
+  // Senha do administrador é fixa e não pode ser alterada
+  if (userId === '__admin__') {
+    erro.textContent = '❌ A senha do administrador é fixa e não pode ser alterada.';
+    return;
+  }
 
   const usrObj = carregarUsuarios()[userId];
   const senhaAtualOk = await (usrObj
@@ -1515,7 +1505,11 @@ async function confirmarRecuperacao() {
   const confirma = document.getElementById('recuperarConfirmaSenha').value;
   const erro = document.getElementById('recuperarErro2');
 
-  if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
+  // Senha do administrador é fixa e não pode ser redefinida
+  if (userId === '__admin__') {
+    erro.textContent = '❌ A senha do administrador é fixa e não pode ser redefinida.';
+    return;
+  }
   if (nova !== confirma) { erro.textContent = '❌ As senhas não coincidem.'; return; }
 
   try {
@@ -1686,26 +1680,8 @@ function toggleVerCodigo() {
 }
 
 async function salvarSenhaAdmin() {
-  const nova = document.getElementById('adminNovaSenha').value;
-  const confirma = document.getElementById('adminConfirmaSenha').value;
   const erro = document.getElementById('adminSenhaErro');
-  if (nova.length < 4) { erro.textContent = '❌ A nova senha deve ter pelo menos 4 caracteres.'; return; }
-  if (nova !== confirma) { erro.textContent = '❌ As senhas não coincidem.'; return; }
-  try {
-    const usuarios = carregarUsuarios();
-    if (!usuarios.__admin__) usuarios.__admin__ = { nome: 'Administrador', tipo: 'admin' };
-    const { hash, salt } = await hashSenhaNovo(nova);
-    usuarios.__admin__.hash = hash;
-    usuarios.__admin__.salt = salt;
-    salvarUsuarios(usuarios);
-    localStorage.setItem('combatfire_admin_hash', hash);
-    document.getElementById('adminNovaSenha').value = '';
-    document.getElementById('adminConfirmaSenha').value = '';
-    erro.textContent = '';
-    mostrarToast('✅ Senha do administrador redefinida com sucesso!');
-  } catch(e) {
-    erro.textContent = '❌ Erro ao salvar a senha.';
-  }
+  erro.textContent = '❌ A senha do administrador é fixa e não pode ser alterada por aqui.';
 }
 
 // ============ EXPORTAR / IMPORTAR BACKUP ============
@@ -1719,7 +1695,11 @@ async function exportarBackup() {
     versao: 1,
     exportadoEm: new Date().toISOString(),
     totalEmpresas: banco.length,
-    empresas: banco
+    empresas: banco,
+    _auth: {
+      usuarios: carregarUsuarios(),
+      recoveryHash: (function(){ try { return localStorage.getItem('combatfire_recovery_hash') || ''; } catch(e){ return ''; } })()
+    }
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1745,6 +1725,15 @@ function importarBackup(event) {
 
     const lista = Array.isArray(dados) ? dados : (Array.isArray(dados.empresas) ? dados.empresas : null);
     if (!lista) { mostrarToast('❌ Backup não reconhecido.', true); event.target.value = ''; return; }
+
+    // Restaura credenciais de acesso se presentes no backup
+    if (dados._auth && dados._auth.usuarios && typeof dados._auth.usuarios === 'object') {
+      try {
+        salvarUsuarios(dados._auth.usuarios);
+        if (dados._auth.recoveryHash) localStorage.setItem('combatfire_recovery_hash', dados._auth.recoveryHash);
+        popularSelectLogin();
+      } catch(e) {}
+    }
 
     const validas = lista.filter(e => e && e.id && e.nome);
     if (validas.length === 0) { mostrarToast('❌ Nenhuma edificação válida no arquivo.', true); event.target.value = ''; return; }
@@ -4085,6 +4074,59 @@ async function excluirEmpresa(id) {
     <button class="btn-cinza" style="margin:0;" onclick="document.getElementById('confirmarExcluirEmpresaBanner').remove()">Cancelar</button>
   `;
   if (cont) cont.insertBefore(banner, cont.firstChild);
+}
+
+// ============ SINCRONIZAÇÃO DE CREDENCIAIS ENTRE DISPOSITIVOS ============
+
+function exportarCredenciais() {
+  try {
+    const payload = {
+      _combatfire_credenciais: true,
+      geradoEm: new Date().toISOString(),
+      usuarios: carregarUsuarios(),
+      recoveryHash: localStorage.getItem('combatfire_recovery_hash') || ''
+    };
+    const texto = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    document.getElementById('exportCredenciaisOutput').value = texto;
+    mostrarToast('✅ Credenciais geradas. Copie o texto e cole no outro dispositivo.');
+  } catch(e) {
+    mostrarToast('❌ Erro ao gerar credenciais.', true);
+  }
+}
+
+function copiarCredenciais() {
+  const el = document.getElementById('exportCredenciaisOutput');
+  if (!el || !el.value) { mostrarToast('Gere as credenciais primeiro.', true); return; }
+  try {
+    navigator.clipboard.writeText(el.value).then(() => mostrarToast('📋 Texto copiado!'));
+  } catch(e) {
+    el.select(); document.execCommand('copy');
+    mostrarToast('📋 Texto copiado!');
+  }
+}
+
+function importarCredenciais() {
+  const erro = document.getElementById('sincronizarErro');
+  erro.textContent = '';
+  const texto = (document.getElementById('importCredenciaisInput').value || '').trim();
+  if (!texto) { erro.textContent = '❌ Cole o texto exportado do outro dispositivo.'; return; }
+  try {
+    const json = decodeURIComponent(escape(atob(texto)));
+    const payload = JSON.parse(json);
+    if (!payload._combatfire_credenciais || !payload.usuarios) {
+      erro.textContent = '❌ Texto inválido. Use o texto gerado pelo botão "Gerar credenciais".';
+      return;
+    }
+    salvarUsuarios(payload.usuarios);
+    if (payload.recoveryHash) {
+      try { localStorage.setItem('combatfire_recovery_hash', payload.recoveryHash); } catch(e) {}
+    }
+    popularSelectLogin();
+    document.getElementById('importCredenciaisInput').value = '';
+    mostrarToast('✅ Credenciais importadas! As senhas agora estão sincronizadas neste dispositivo.');
+  } catch(e) {
+    erro.textContent = '❌ Texto inválido ou corrompido.';
+  }
 }
 
 // ============ TEMA ESCURO ============
